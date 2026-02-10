@@ -78,63 +78,63 @@ const questions = [
     question: "Je trouve rassurant de suivre des règles, des normes ou des consignes établies.",
     category: 'C'
   },
-   {
+  {
     question: "J'aime travailler dehors ou dans des lieux où l'on bouge plutôt que rester assis longtemps.",
     category: 'R'
   },
-   {
+  {
     question: "J'aime chercher des explications rationnelles aux phénomènes que j'observe.",
     category: 'I'
   },
-   {
+  {
     question: "Je me sens bien quand je peux exprimer ma personnalité à travers ce que je produis.",
     category: 'A'
   },
-   {
+  {
     question: "Je suis souvent la personne vers qui les autres se tournent pour demander conseil ou soutien.",
     category: 'S'
   },
-   {
+  {
     question: "J'aime prendre des initiatives et lancer de nouveaux projets ou activités.",
     category: 'E'
   },
-   {
+  {
     question: "Je suis attentif(ve) aux détails lorsqu'il s'agit de remplir des formulaires, tableaux ou documents.",
     category: 'C'
   },
-   {
+  {
     question: "Je préfère que le résultat de mon travail soit visible et tangible.",
     category: 'R'
   },
-   {
+  {
     question: "Je prends plaisir à lire, chercher ou croiser des informations pour mieux comprendre un sujet.",
     category: 'I'
   },
-   {
+  {
     question: "Je tolère bien l'ambiguïté et les situations où il n'y a pas une seule bonne réponse.",
     category: 'A'
   },
-   {
+  {
     question: "Je me sens utile quand je contribue au bien-être ou à la réussite d'autres personnes.",
     category: 'S'
   },
-   {
+  {
     question: "La compétition ou le fait de « se dépasser » m'attire.",
     category: 'E'
   },
-   {
+  {
     question: "J'aime quand mon environnement de travail est structuré, prévisible et planifié.",
     category: 'C'
   },
-   {
+  {
     question: "Je me vois bien dans un métier où l'on manipule des outils, des matériaux ou des équipements.",
     category: 'R'
   },
-   {
+  {
     question: "Je me vois bien dans un métier où l'on observe, analyse, étudie ou diagnostique.",
     category: 'I'
   },
-   {
+  {
     question: "Je me vois bien dans un métier où la créativité et l'expression personnelle ont une grande place.",
     category: 'A'
   },
@@ -189,9 +189,9 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
           <h1 className="text-xl font-bold text-gray-800">Test de personnalité</h1>
           <span className="text-sm text-gray-500">{currentQuestion + 1}/{questions.length}</span>
         </div>
-        
+
         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
@@ -214,39 +214,39 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
         </div>
       </div>
 
-      {/* Answers - hauteur fixe */}
-      <div className="p-6 space-y-3 flex-shrink-0">
-        <button
-          onClick={() => handleAnswer(5)}
-          className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
-        >
-          Tout à fait d'accord
-        </button>
-        <button
-          onClick={() => handleAnswer(4)}
-          className="w-full py-4 rounded-2xl font-semibold bg-primary-100 text-primary-700"
-        >
-          Plutôt d'accord
-        </button>
-        <button
-          onClick={() => handleAnswer(3)}
-          className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700"
-        >
-          Neutre
-        </button>
-        <button
-          onClick={() => handleAnswer(2)}
-          className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700"
-        >
-          Plutôt en désaccord
-        </button>
-        <button
-          onClick={() => handleAnswer(1)}
-          className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700"
-        >
-          Pas du tout d'accord
-        </button>
-      </div>
+     
+<div className="p-6 space-y-3 flex-shrink-0">
+  <button
+    onClick={() => handleAnswer(5)}
+    className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
+  >
+    Tout à fait d'accord
+  </button>
+  <button
+    onClick={() => handleAnswer(4)}
+    className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
+  >
+    Plutôt d'accord
+  </button>
+  <button
+    onClick={() => handleAnswer(3)}
+    className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
+  >
+    Neutre
+  </button>
+  <button
+    onClick={() => handleAnswer(2)}
+    className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
+  >
+    Plutôt en désaccord
+  </button>
+  <button
+    onClick={() => handleAnswer(1)}
+    className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
+  >
+    Pas du tout d'accord
+  </button>
+</div>
     </div>
   );
 }
