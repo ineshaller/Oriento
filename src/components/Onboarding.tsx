@@ -10,7 +10,7 @@ const slides = [
     icon: Target,
     title: "Trouve ta voie",
     description: "Découvre des métiers qui correspondent à ta personnalité et tes passions",
-    color: "from-primary-400 to-primary-500"
+    color: "from-primary-500 to-primary-600"
   },
   {
     icon: MessageCircle,
@@ -22,7 +22,7 @@ const slides = [
     icon: Sparkles,
     title: "Construis ton projet",
     description: "Explore les formations et parcours adaptés à tes ambitions",
-    color: "from-primary-600 to-primary-700"
+    color: "from-primary-500 to-primary-600"
   }
 ];
 
