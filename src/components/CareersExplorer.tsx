@@ -33,7 +33,7 @@ const careers = [
     sector: 'Création',
     education: 'Bac+3 à Bac+5',
     icon: Palette,
-    color: 'from-purple-400 to-purple-500',
+    color: 'from-primary-400 to-primary-500',
     riasec: ['A', 'I']
   },
   {
@@ -114,7 +114,7 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Rechercher un métier..."
-            className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-300"
+            className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
 
@@ -126,7 +126,7 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
               onClick={() => setSelectedSector(sector)}
               className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedSector === sector
-                  ? 'bg-purple-500 text-white'
+                  ? 'bg-primary-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -166,7 +166,7 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
                         key={code}
                         className={`px-2 py-1 text-xs font-medium rounded-md ${
                           userProfile.riasecProfile?.includes(code)
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-primary-100 text-primary-700'
                             : 'bg-gray-100 text-gray-600'
                         }`}
                       >
@@ -178,7 +178,7 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCareerClick(career.id)}
-                      className="flex-1 py-2 bg-purple-500 text-white rounded-xl text-sm font-semibold hover:bg-purple-600 transition-colors"
+                      className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
                     >
                       Voir le détail
                     </button>
@@ -186,7 +186,7 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
                       onClick={() => onToggleFavorite(career.id)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                         favorite
-                          ? 'bg-purple-100 text-purple-600'
+                          ? 'bg-primary-100 text-primary-600'
                           : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                       }`}
                     >

@@ -10,7 +10,7 @@ interface FavoritesProps {
 const careerIcons: { [key: string]: any } = {
   'dev-web': { icon: Code, color: 'from-blue-400 to-blue-500' },
   'medecin': { icon: Heart, color: 'from-red-400 to-red-500' },
-  'designer': { icon: Palette, color: 'from-purple-400 to-purple-500' },
+  'designer': { icon: Palette, color: 'from-primary-400 to-primary-500' },
   'architecte': { icon: Building, color: 'from-gray-400 to-gray-500' },
   'prof': { icon: GraduationCap, color: 'from-green-400 to-green-500' },
   'ingenieur': { icon: Briefcase, color: 'from-indigo-400 to-indigo-500' },
@@ -78,13 +78,13 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCareerClick(jobId)}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-xl text-sm font-semibold hover:bg-purple-600 transition-colors"
+                      className="px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
                     >
                       Voir
                     </button>
                     <button
                       onClick={() => onToggleFavorite(jobId)}
-                      className="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center hover:bg-purple-200 transition-colors"
+                      className="w-10 h-10 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center hover:bg-primary-200 transition-colors"
                     >
                       <Bookmark className="w-5 h-5 fill-current" />
                     </button>

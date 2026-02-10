@@ -1,0 +1,106 @@
+/* Primary Color System - Centralized Color Management */
+
+/* Background Colors */
+.bg-primary-50 {
+  background-color: oklch(.932 .032 255.585);
+}
+
+.bg-primary-100 {
+  background-color: oklch(.932 .032 255.585);
+}
+
+.bg-primary-200 {
+  background-color: oklch(.707 .165 254.624);
+}
+
+.bg-primary-400 {
+  background-color: oklch(.707 .165 254.624);
+}
+
+.bg-primary-500 {
+  background-color: oklch(.623 .214 259.815);
+}
+
+.bg-primary-600 {
+  background-color: oklch(.546 .245 262.881);
+}
+
+.bg-primary-700 {
+  background-color: oklch(.488 .243 264.376);
+}
+
+/* Text Colors */
+.text-primary-50 {
+  color: oklch(.932 .032 255.585);
+}
+
+.text-primary-100 {
+  color: oklch(.932 .032 255.585);
+}
+
+.text-primary-200 {
+  color: oklch(.707 .165 254.624);
+}
+
+.text-primary-600 {
+  color: oklch(.546 .245 262.881);
+}
+
+.text-primary-700 {
+  color: oklch(.488 .243 264.376);
+}
+
+.text-primary-900 {
+  color: oklch(.488 .243 264.376);
+}
+
+/* Border Colors */
+.border-primary-50 {
+  border-color: oklch(.932 .032 255.585);
+}
+
+.border-primary-100 {
+  border-color: oklch(.932 .032 255.585);
+}
+
+.border-primary-200 {
+  border-color: oklch(.707 .165 254.624);
+}
+
+/* Gradient Utilities */
+.bg-gradient-to-br.from-primary-50.to-white {
+  background: linear-gradient(to bottom right, oklch(.932 .032 255.585), #ffffff);
+}
+
+.bg-gradient-to-br.from-primary-100.via-white.to-primary-50 {
+  background: linear-gradient(to bottom right, oklch(.932 .032 255.585), #ffffff, oklch(.932 .032 255.585));
+}
+
+.bg-gradient-to-r.from-primary-500.to-primary-600 {
+  background: linear-gradient(to right, oklch(.623 .214 259.815), oklch(.546 .245 262.881));
+}
+
+.bg-gradient-to-br.from-primary-500.to-primary-600 {
+  background: linear-gradient(to bottom right, oklch(.623 .214 259.815), oklch(.546 .245 262.881));
+}
+
+.bg-gradient-to-br.from-primary-50.to-white {
+  background: linear-gradient(to bottom right, oklch(.932 .032 255.585), #ffffff);
+}
+
+/* Focus and Hover States */
+.hover\:bg-primary-50:hover {
+  background-color: oklch(.932 .032 255.585);
+}
+
+.hover\:bg-primary-100:hover {
+  background-color: oklch(.932 .032 255.585);
+}
+
+.hover\:bg-primary-600:hover {
+  background-color: oklch(.546 .245 262.881);
+}
+
+.hover\:bg-primary-200:hover {
+  background-color: oklch(.707 .165 254.624);
+}

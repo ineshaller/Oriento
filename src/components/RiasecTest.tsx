@@ -7,76 +7,144 @@ interface RiasecTestProps {
 
 const questions = [
   {
-    question: "J'aime travailler avec mes mains et créer des objets concrets",
+    question: "J'aime comprendre comment les objets ou les systèmes fonctionnent concrètement.",
     category: 'R'
   },
   {
-    question: "Je suis curieux(se) et j'aime comprendre comment les choses fonctionnent",
+    question: "J'apprécie d'analyser des problèmes complexes pour en trouver la cause.",
     category: 'I'
   },
   {
-    question: "J'aime créer, imaginer et m'exprimer de façon originale",
+    question: "Je prends plaisir à créer quelque chose de nouveau (texte, image, musique, idée originale).",
     category: 'A'
   },
   {
-    question: "J'aime aider les autres et travailler en équipe",
+    question: "J'aime être en contact direct avec les gens et échanger avec eux.",
     category: 'S'
   },
   {
-    question: "J'aime organiser, planifier et prendre des initiatives",
+    question: "Je me sens à l'aise pour prendre des décisions qui engagent d'autres personnes.",
     category: 'E'
   },
   {
-    question: "Je préfère les tâches précises et bien définies",
+    question: "J'aime quand les procédures sont claires et bien organisées.",
     category: 'C'
   },
   {
-    question: "Les activités physiques et pratiques me motivent",
+    question: "Je préfère les activités où je peux utiliser mes mains ou mon corps (bricoler, manipuler, installer, réparer).",
     category: 'R'
   },
   {
-    question: "J'aime analyser des problèmes complexes et chercher des solutions",
+    question: "Je suis attiré(e) par la recherche d'informations, la curiosité scientifique ou l'observation minutieuse.",
     category: 'I'
   },
   {
-    question: "L'art, la musique ou la littérature m'inspirent beaucoup",
+    question: "Je cherche souvent des façons originales ou non conventionnelles de faire les choses.",
     category: 'A'
   },
   {
-    question: "Écouter et conseiller les autres me vient naturellement",
+    question: "J'aime écouter les autres parler de leurs difficultés et essayer de les comprendre.",
     category: 'S'
   },
   {
-    question: "J'aime convaincre et influencer les décisions",
+    question: "Je me projette facilement dans des projets ambitieux ou des objectifs à atteindre.",
     category: 'E'
   },
   {
-    question: "Je suis méthodique et j'aime suivre des procédures",
+    question: "J'apprécie de tenir mes documents, dossiers ou fichiers bien classés.",
     category: 'C'
   },
   {
-    question: "Je préfère les résultats concrets et visibles",
+    question: "Je me sens à l'aise dans des environnements concrets, pratiques, voire physiques.",
     category: 'R'
   },
   {
-    question: "Les sciences et la recherche m'attirent",
+    question: "J'aime résoudre des énigmes, des problèmes logiques ou des questions abstraites.",
     category: 'I'
   },
   {
-    question: "J'ai besoin de liberté créative dans mon travail",
+    question: "Je suis sensible à l'esthétique (formes, couleurs, ambiance, mise en scène).",
     category: 'A'
   },
   {
-    question: "Le bien-être des autres est important pour moi",
+    question: "Je suis prêt(e) à consacrer du temps pour aider quelqu'un à progresser ou à apprendre.",
     category: 'S'
   },
   {
-    question: "J'aime relever des défis et atteindre des objectifs ambitieux",
+    question: "Prendre la parole pour défendre une idée ou convaincre ne me dérange pas.",
     category: 'E'
   },
   {
-    question: "L'ordre et la rigueur sont essentiels pour moi",
+    question: "Je trouve rassurant de suivre des règles, des normes ou des consignes établies.",
     category: 'C'
+  },
+   {
+    question: "J'aime travailler dehors ou dans des lieux où l'on bouge plutôt que rester assis longtemps.",
+    category: 'R'
+  },
+   {
+    question: "J'aime chercher des explications rationnelles aux phénomènes que j'observe.",
+    category: 'I'
+  },
+   {
+    question: "Je me sens bien quand je peux exprimer ma personnalité à travers ce que je produis.",
+    category: 'A'
+  },
+   {
+    question: "Je suis souvent la personne vers qui les autres se tournent pour demander conseil ou soutien.",
+    category: 'S'
+  },
+   {
+    question: "J'aime prendre des initiatives et lancer de nouveaux projets ou activités.",
+    category: 'E'
+  },
+   {
+    question: "Je suis attentif(ve) aux détails lorsqu'il s'agit de remplir des formulaires, tableaux ou documents.",
+    category: 'C'
+  },
+   {
+    question: "Je préfère que le résultat de mon travail soit visible et tangible.",
+    category: 'R'
+  },
+   {
+    question: "Je prends plaisir à lire, chercher ou croiser des informations pour mieux comprendre un sujet.",
+    category: 'I'
+  },
+   {
+    question: "Je tolère bien l'ambiguïté et les situations où il n'y a pas une seule bonne réponse.",
+    category: 'A'
+  },
+   {
+    question: "Je me sens utile quand je contribue au bien-être ou à la réussite d'autres personnes.",
+    category: 'S'
+  },
+   {
+    question: "La compétition ou le fait de « se dépasser » m'attire.",
+    category: 'E'
+  },
+   {
+    question: "J'aime quand mon environnement de travail est structuré, prévisible et planifié.",
+    category: 'C'
+  },
+   {
+    question: "Je me vois bien dans un métier où l'on manipule des outils, des matériaux ou des équipements.",
+    category: 'R'
+  },
+   {
+    question: "Je me vois bien dans un métier où l'on observe, analyse, étudie ou diagnostique.",
+    category: 'I'
+  },
+   {
+    question: "Je me vois bien dans un métier où la créativité et l'expression personnelle ont une grande place.",
+    category: 'A'
+  },
+  {
+    question: "Je me vois bien dans un métier où l'on accompagne, forme ou soutient des personnes.",
+    category: 'S'
+  },
+  {
+    question: "Je me vois bien dans un métier où l'on dirige des projets, des équipes ou des activités économiques.",
+    category: 'E'
   }
 ];
 
@@ -115,8 +183,8 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      {/* Header */}
-      <div className="p-6 pb-4">
+      {/* Header - hauteur fixe */}
+      <div className="p-6 pb-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold text-gray-800">Test de personnalité</h1>
           <span className="text-sm text-gray-500">{currentQuestion + 1}/{questions.length}</span>
@@ -124,39 +192,39 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
         
         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <div className="mt-4 flex items-start gap-2 bg-purple-50 p-3 rounded-xl">
-          <Info className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-purple-900">
+        <div className="mt-4 flex items-start gap-2 bg-primary-50 p-3 rounded-xl">
+          <Info className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-primary-900">
             Il n'y a pas de bonne ou mauvaise réponse. Réponds spontanément selon ce qui te correspond le mieux.
           </p>
         </div>
       </div>
 
-      {/* Question */}
-      <div className="flex-1 flex flex-col justify-center px-6">
-        <div className="bg-gradient-to-br from-purple-50 to-white p-8 rounded-3xl border-2 border-purple-100">
+      {/* Question - zone flexible avec hauteur minimale */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-4 min-h-[200px]">
+        <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-3xl border-2 border-primary-100 flex items-center justify-center min-h-[160px]">
           <p className="text-xl text-gray-800 text-center leading-relaxed">
             {questions[currentQuestion].question}
           </p>
         </div>
       </div>
 
-      {/* Answers */}
-      <div className="p-6 space-y-3">
+      {/* Answers - hauteur fixe */}
+      <div className="p-6 space-y-3 flex-shrink-0">
         <button
           onClick={() => handleAnswer(5)}
-          className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg"
+          className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
         >
           Tout à fait d'accord
         </button>
         <button
           onClick={() => handleAnswer(4)}
-          className="w-full py-4 rounded-2xl font-semibold bg-purple-100 text-purple-700"
+          className="w-full py-4 rounded-2xl font-semibold bg-primary-100 text-primary-700"
         >
           Plutôt d'accord
         </button>

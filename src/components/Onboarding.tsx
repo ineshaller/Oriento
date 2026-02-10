@@ -10,19 +10,19 @@ const slides = [
     icon: Target,
     title: "Trouve ta voie",
     description: "Découvre des métiers qui correspondent à ta personnalité et tes passions",
-    color: "from-purple-400 to-purple-500"
+    color: "from-primary-400 to-primary-500"
   },
   {
     icon: MessageCircle,
     title: "Un assistant toujours là",
     description: "Pose toutes tes questions à notre chatbot intelligent pour t'aider à chaque étape",
-    color: "from-purple-500 to-purple-600"
+    color: "from-primary-500 to-primary-600"
   },
   {
     icon: Sparkles,
     title: "Construis ton projet",
     description: "Explore les formations et parcours adaptés à tes ambitions",
-    color: "from-purple-600 to-purple-700"
+    color: "from-primary-600 to-primary-700"
   }
 ];
 
@@ -41,7 +41,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const Icon = slide.icon;
 
   return (
-    <div className="h-screen flex flex-col p-8 bg-gradient-to-br from-purple-50 to-white">
+    <div className="h-screen flex flex-col p-8 bg-gradient-to-br from-primary-50 to-white">
       {/* Progress dots */}
       <div className="flex justify-center gap-2 mb-12">
         {slides.map((_, index) => (
@@ -49,8 +49,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             key={index}
             className={`h-2 rounded-full transition-all ${
               index === currentSlide 
-                ? 'w-8 bg-purple-500' 
-                : 'w-2 bg-purple-200'
+                ? 'w-8 bg-primary-500' 
+                : 'w-2 bg-primary-200'
             }`}
           />
         ))}
@@ -76,14 +76,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {currentSlide < slides.length - 1 && (
           <button
             onClick={() => setCurrentSlide(slides.length - 1)}
-            className="flex-1 py-4 rounded-2xl font-semibold text-purple-600 bg-purple-50"
+            className="flex-1 py-4 rounded-2xl font-semibold text-primary-600 bg-primary-50"
           >
             Passer
           </button>
         )}
         <button
           onClick={handleNext}
-          className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
+          className="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
         >
           {currentSlide === slides.length - 1 ? 'Lancer le test' : 'Suivant'}
           <ChevronRight className="w-5 h-5" />

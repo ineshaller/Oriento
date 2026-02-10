@@ -79,7 +79,7 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Image Header */}
-      <div className="relative h-48 bg-gradient-to-br from-purple-400 to-purple-600">
+      <div className="relative h-48 bg-gradient-to-br from-primary-400 to-primary-600">
         <img 
           src={career.image} 
           alt={career.title}
@@ -98,7 +98,7 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
           <button
             onClick={() => onToggleFavorite(careerId)}
             className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg ${
-              isFavorite ? 'bg-purple-500' : 'bg-white/90'
+              isFavorite ? 'bg-primary-500' : 'bg-white/90'
             }`}
           >
             {isFavorite ? (
@@ -118,20 +118,20 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
       <div className="p-6 space-y-6">
         {/* Quick Info */}
         <div className="flex gap-3">
-          <div className="flex-1 bg-purple-50 rounded-xl p-3 text-center">
-            <TrendingUp className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+          <div className="flex-1 bg-primary-50 rounded-xl p-3 text-center">
+            <TrendingUp className="w-5 h-5 text-primary-600 mx-auto mb-1" />
             <p className="text-xs text-gray-600 mb-1">Perspectives</p>
-            <p className="text-xs font-semibold text-purple-700">{career.outlook}</p>
+            <p className="text-xs font-semibold text-primary-700">{career.outlook}</p>
           </div>
-          <div className="flex-1 bg-purple-50 rounded-xl p-3 text-center">
-            <GraduationCap className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+          <div className="flex-1 bg-primary-50 rounded-xl p-3 text-center">
+            <GraduationCap className="w-5 h-5 text-primary-600 mx-auto mb-1" />
             <p className="text-xs text-gray-600 mb-1">Niveau</p>
-            <p className="text-xs font-semibold text-purple-700">{career.education[career.education.length - 1]}</p>
+            <p className="text-xs font-semibold text-primary-700">{career.education[career.education.length - 1]}</p>
           </div>
-          <div className="flex-1 bg-purple-50 rounded-xl p-3 text-center">
-            <Star className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+          <div className="flex-1 bg-primary-50 rounded-xl p-3 text-center">
+            <Star className="w-5 h-5 text-primary-600 mx-auto mb-1" />
             <p className="text-xs text-gray-600 mb-1">Salaire</p>
-            <p className="text-xs font-semibold text-purple-700">{career.salary}</p>
+            <p className="text-xs font-semibold text-primary-700">{career.salary}</p>
           </div>
         </div>
 
@@ -159,7 +159,7 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
           <div className="space-y-2">
             {career.qualities.map((quality: string) => (
               <div key={quality} className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-purple-500" />
+                <CheckCircle className="w-5 h-5 text-primary-500" />
                 <span className="text-gray-700">{quality}</span>
               </div>
             ))}
@@ -173,11 +173,11 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
             {career.paths.map((path: any, index: number) => (
               <div key={index} className="flex gap-3">
                 <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
                     {index + 1}
                   </div>
                   {index < career.paths.length - 1 && (
-                    <div className="w-0.5 h-full bg-purple-200 my-1"></div>
+                    <div className="w-0.5 h-full bg-primary-200 my-1"></div>
                   )}
                 </div>
                 <div className="flex-1 pb-4">
@@ -206,7 +206,7 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
       <div className="fixed bottom-20 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent">
         <button
           onClick={onChat}
-          className="w-full max-w-md mx-auto block bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
+          className="w-full max-w-md mx-auto block bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
         >
           <MessageCircle className="w-5 h-5" />
           Discuter avec le chatbot

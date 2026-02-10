@@ -91,7 +91,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
             <div
               key={num}
               className={`flex-1 h-1.5 rounded-full transition-colors ${
-                num <= step ? 'bg-purple-500' : 'bg-gray-200'
+                num <= step ? 'bg-primary-500' : 'bg-gray-200'
               }`}
             />
           ))}
@@ -109,16 +109,16 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
             <div className="flex items-center justify-center gap-4 mt-12">
               <button
                 onClick={() => setAge(Math.max(14, age - 1))}
-                className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 font-bold text-xl"
+                className="w-12 h-12 rounded-full bg-primary-100 text-primary-600 font-bold text-xl"
               >
                 -
               </button>
-              <div className="text-6xl font-bold text-purple-600">
+              <div className="text-6xl font-bold text-primary-600">
                 {age}
               </div>
               <button
                 onClick={() => setAge(Math.min(18, age + 1))}
-                className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 font-bold text-xl"
+                className="w-12 h-12 rounded-full bg-primary-100 text-primary-600 font-bold text-xl"
               >
                 +
               </button>
@@ -138,7 +138,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
                   onClick={() => setGrade(g)}
                   className={`w-full p-4 rounded-2xl text-left font-semibold transition-all ${
                     grade === g
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -161,7 +161,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
                   onClick={() => toggleSpecialty(specialty)}
                   className={`px-4 py-2 rounded-full font-medium transition-all ${
                     selectedSpecialties.includes(specialty)
-                      ? 'bg-purple-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -184,7 +184,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
                   onClick={() => toggleInterest(id)}
                   className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all ${
                     selectedInterests.includes(id)
-                      ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg'
                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -202,7 +202,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
         <button
           onClick={handleNext}
           disabled={!canProceed()}
-          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {step === 4 ? 'Commencer le test' : 'Suivant'}
           <ChevronRight className="w-5 h-5" />

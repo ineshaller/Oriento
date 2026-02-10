@@ -50,11 +50,11 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
   const secondaryProfiles = riasecProfile.slice(1, 3).map(p => profileDescriptions[p]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white pb-24">
       {/* Header */}
       <div className="p-6">
         <div className="flex items-center justify-center mb-6">
-          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
             <Sparkles className="w-10 h-10 text-white" />
           </div>
         </div>
@@ -69,14 +69,14 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
 
       {/* Main Profile */}
       <div className="px-6 mb-6">
-        <div className="bg-white rounded-3xl p-6 shadow-lg border-2 border-purple-200">
+        <div className="bg-white rounded-3xl p-6 shadow-lg border-2 border-primary-200">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
               {riasecProfile[0]}
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800">{mainProfile.name}</h2>
-              <p className="text-sm text-purple-600">Profil principal</p>
+              <p className="text-sm text-primary-600">Profil principal</p>
             </div>
           </div>
           
@@ -86,7 +86,7 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
 
           <div className="flex flex-wrap gap-2 mb-4">
             {mainProfile.traits.map(trait => (
-              <span key={trait} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+              <span key={trait} className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
                 {trait}
               </span>
             ))}
@@ -112,7 +112,7 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
           {secondaryProfiles.map((profile, index) => (
             <div key={riasecProfile[index + 1]} className="bg-white rounded-2xl p-4 shadow">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 font-bold">
+                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 font-bold">
                   {riasecProfile[index + 1]}
                 </div>
                 <h4 className="font-semibold text-gray-800">{profile.name}</h4>
@@ -127,7 +127,7 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
       <div className="px-6 space-y-3">
         <button
           onClick={onExplore}
-          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
+          className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
         >
           Explorer les métiers
           <ArrowRight className="w-5 h-5" />
@@ -135,7 +135,7 @@ export default function TestResults({ riasecProfile, onExplore, onChat }: TestRe
         
         <button
           onClick={onChat}
-          className="w-full bg-white border-2 border-purple-200 text-purple-600 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2"
+          className="w-full bg-white border-2 border-primary-200 text-primary-600 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2"
         >
           <MessageCircle className="w-5 h-5" />
           Discuter avec le chatbot

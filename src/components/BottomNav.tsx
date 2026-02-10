@@ -27,18 +27,18 @@ export default function BottomNav({ currentScreen, onNavigate }: BottomNavProps)
                 onClick={() => onNavigate(id)}
                 className={`flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-xl transition-all ${
                   isActive 
-                    ? 'bg-purple-50' 
+                    ? 'bg-primary-50' 
                     : 'hover:bg-gray-50'
                 }`}
               >
                 <Icon 
                   className={`w-6 h-6 ${
-                    isActive ? 'text-purple-600' : 'text-gray-500'
+                    isActive ? 'text-primary-600' : 'text-gray-500'
                   }`}
                 />
                 <span 
                   className={`text-xs font-medium ${
-                    isActive ? 'text-purple-600' : 'text-gray-500'
+                    isActive ? 'text-primary-600' : 'text-gray-500'
                   }`}
                 >
                   {label}

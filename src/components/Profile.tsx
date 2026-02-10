@@ -33,7 +33,7 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 pb-12 rounded-b-3xl">
+      <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-6 pb-12 rounded-b-3xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-white">Mon profil</h1>
           <button
@@ -49,7 +49,7 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
             <User className="w-12 h-12 text-white" />
           </div>
           <h2 className="text-xl font-bold text-white mb-1">Lycéen</h2>
-          <p className="text-purple-100">{userProfile.age || 16} ans • {userProfile.grade || 'Seconde'}</p>
+          <p className="text-primary-100">{userProfile.age || 16} ans • {userProfile.grade || 'Seconde'}</p>
         </div>
       </div>
 
@@ -59,8 +59,8 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
         {userProfile.riasecProfile && userProfile.riasecProfile.length > 0 && (
           <div className="bg-white rounded-2xl p-5 shadow-lg">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary-600" />
               </div>
               <h3 className="font-bold text-gray-800">Profil de personnalité</h3>
             </div>
@@ -68,12 +68,12 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
             <div className="space-y-2">
               {userProfile.riasecProfile.map((code, index) => (
                 <div key={code} className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                     {code}
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-gray-800">{riasecNames[code]}</p>
-                    {index === 0 && <p className="text-xs text-purple-600">Profil principal</p>}
+                    {index === 0 && <p className="text-xs text-primary-600">Profil principal</p>}
                   </div>
                 </div>
               ))}
@@ -155,7 +155,7 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
         {/* Edit Button */}
         <button
           onClick={onEdit}
-          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold shadow-lg"
+          className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold shadow-lg"
         >
           Modifier mon profil
         </button>
