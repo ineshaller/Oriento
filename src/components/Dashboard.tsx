@@ -59,7 +59,7 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
             onClick={() => onNavigate('chatbot')}
             className="w-full p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 text-left">
