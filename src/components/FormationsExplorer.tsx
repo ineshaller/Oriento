@@ -15,8 +15,7 @@ import {
   HeartPulse,
   PersonStanding,
   Bookmark,
-  BookmarkPlus,
-  User
+  BookmarkPlus
 } from "lucide-react";
 import type { UserProfile } from "../App";
 
@@ -26,7 +25,7 @@ interface FormationsExplorerProps {
   onToggleFavorite: (formationId: string) => void;
 }
 
-/* -------------------- DOMAIN CONFIG EXACT -------------------- */
+/* -------------------- DOMAIN CONFIG -------------------- */
 
 const domainConfig: Record<string, any> = {
   "Droit": GraduationCap,
@@ -57,7 +56,7 @@ function getIconFromDomain(domain: string) {
   return domainConfig[domain] || domainConfig["Autre"];
 }
 
-/* -------------------- SECTORS FROM JSON -------------------- */
+/* -------------------- SECTORS -------------------- */
 
 const sectors: string[] = [
   "Tous",
@@ -67,9 +66,8 @@ const sectors: string[] = [
         f.domain ? f.domain.split(",")[0].trim() : "Autre"
       )
     )
-  ).map(s => String(s)) // <-- assure à TypeScript que c'est bien des string
+  ).map(s => String(s))
 ];
-
 
 /* -------------------- COMPONENT -------------------- */
 
@@ -81,6 +79,8 @@ export default function FormationsExplorer({
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedSector, setSelectedSector] = useState<string>("Tous");
+  const [page, setPage] = useState<number>(1); // page actuelle
+  const PAGE_SIZE = 50; // nombre de formations par page
 
   /* -------------------- FILTER -------------------- */
 
@@ -98,6 +98,9 @@ export default function FormationsExplorer({
 
     return matchesSearch && matchesSector;
   });
+
+  // slice pour pagination
+  const displayedFormations = filteredFormations.slice(0, page * PAGE_SIZE);
 
   const isFavorite = (formationId: string) => {
     return userProfile.favoriteJobs?.includes(formationId);
@@ -120,7 +123,10 @@ export default function FormationsExplorer({
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1); // reset page si recherche change
+            }}
             placeholder="Rechercher une formation..."
             className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary-300"
           />
@@ -131,7 +137,10 @@ export default function FormationsExplorer({
           {sectors.map((sector: string) => (
             <button
               key={sector}
-              onClick={() => setSelectedSector(sector)}
+              onClick={() => {
+                setSelectedSector(sector);
+                setPage(1); // reset page si secteur change
+              }}
               className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedSector === sector
                   ? "bg-primary-500 text-white"
@@ -146,7 +155,7 @@ export default function FormationsExplorer({
 
       {/* CARDS */}
       <div className="p-6 space-y-3">
-        {filteredFormations.map((f) => {
+        {displayedFormations.map((f) => {
 
           const firstDomain = f.domain
             ? f.domain.split(",")[0].trim()
@@ -210,6 +219,18 @@ export default function FormationsExplorer({
           );
         })}
       </div>
+
+      {/* LOAD MORE */}
+      {displayedFormations.length < filteredFormations.length && (
+        <div className="flex justify-center py-6">
+          <button
+            onClick={() => setPage(prev => prev + 1)}
+            className="px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors"
+          >
+            Voir plus
+          </button>
+        </div>
+      )}
 
       {/* EMPTY STATE */}
       {filteredFormations.length === 0 && (

@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 // Chemin vers ton CSV Parcoursup
 const csvPath = path.join(
   __dirname,
-  '../src/data/cartographie_formations_parcoursup2.csv'
+  '../src/data/cartographie_formations_parcoursup.csv'
 );
 
 // Chemin de sortie pour le JSON
