@@ -8,6 +8,8 @@ import Dashboard from './components/Dashboard';
 import Chatbot from './components/Chatbot';
 import CareersExplorer from './components/CareersExplorer';
 import CareerDetail from './components/CareerDetail';
+import FormationsExplorer from './components/FormationsExplorer';
+import FormationDetail from './components/FormationDetail';
 import Favorites from './components/Favorites';
 import Profile from './components/Profile';
 import BottomNav from './components/BottomNav';
@@ -22,6 +24,8 @@ export type Screen =
   | 'chatbot'
   | 'careers'
   | 'career-detail'
+  | 'formations'
+  | 'formation-detail'
   | 'favorites'
   | 'profile';
 
@@ -42,6 +46,7 @@ function App() {
     savedFormations: []
   });
   const [selectedCareer, setSelectedCareer] = useState<string | null>(null);
+  const [selectedFormation, setSelectedFormation] = useState<string | null>(null);
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setUserProfile(prev => ({ ...prev, ...updates }));
@@ -50,6 +55,11 @@ function App() {
   const navigateToCareerDetail = (careerId: string) => {
     setSelectedCareer(careerId);
     setCurrentScreen('career-detail');
+  };
+
+  const navigateToFormationDetail = (formationId: string) => {
+    setSelectedFormation(formationId);
+    setCurrentScreen('formation-detail');
   };
 
   const toggleFavoriteJob = (jobId: string) => {
@@ -61,6 +71,19 @@ function App() {
         favoriteJobs: isFavorite 
           ? favoriteJobs.filter(id => id !== jobId)
           : [...favoriteJobs, jobId]
+      };
+    });
+  };
+
+  const toggleSavedFormation = (formationId: string) => {
+    setUserProfile(prev => {
+      const savedFormations = prev.savedFormations || [];
+      const isSaved = savedFormations.includes(formationId);
+      return {
+        ...prev,
+        savedFormations: isSaved
+          ? savedFormations.filter(id => id !== formationId)
+          : [...savedFormations, formationId]
       };
     });
   };
@@ -114,6 +137,19 @@ function App() {
           onToggleFavorite={toggleFavoriteJob}
           onChat={() => setCurrentScreen('chatbot')}
         />;
+
+      case 'formations':
+        return <FormationsExplorer
+          userProfile={userProfile}
+          onFormationClick={navigateToFormationDetail}
+        />;
+      case 'formation-detail':
+        return <FormationDetail
+          formationId={selectedFormation || ''}
+          userProfile={userProfile}
+          onBack={() => setCurrentScreen('formations')}
+        />;
+
       case 'favorites':
         return <Favorites 
           userProfile={userProfile}

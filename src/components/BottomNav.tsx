@@ -1,4 +1,4 @@
-import { Home, Compass, MessageCircle, Bookmark, User } from 'lucide-react';
+import {Home, Compass, MessageCircle, Bookmark, User, GraduationCap} from 'lucide-react';
 import type { Screen } from '../App';
 
 interface BottomNavProps {
@@ -8,7 +8,8 @@ interface BottomNavProps {
 
 const navItems = [
   { id: 'dashboard' as Screen, icon: Home, label: 'Accueil' },
-  { id: 'careers' as Screen, icon: Compass, label: 'Explorer' },
+  { id: 'careers' as Screen, icon: Compass, label: 'Metiers' },
+  { id: 'formations' as Screen, icon: GraduationCap, label: 'Formations' },
   { id: 'chatbot' as Screen, icon: MessageCircle, label: 'Chatbot' },
   { id: 'favorites' as Screen, icon: Bookmark, label: 'Favoris' },
   { id: 'profile' as Screen, icon: User, label: 'Profil' }
@@ -31,12 +32,12 @@ export default function BottomNav({ currentScreen, onNavigate }: BottomNavProps)
                     : 'hover:bg-gray-50'
                 }`}
               >
-                <Icon 
+                <Icon
                   className={`w-6 h-6 ${
                     isActive ? 'text-primary-600' : 'text-gray-500'
                   }`}
                 />
-                <span 
+                <span
                   className={`text-xs font-medium ${
                     isActive ? 'text-primary-600' : 'text-gray-500'
                   }`}
