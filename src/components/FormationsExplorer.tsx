@@ -62,11 +62,13 @@ const sectors: string[] = [
   "Tous",
   ...Array.from(
     new Set(
-      formationsData.map(f =>
-        f.domain ? f.domain.split(",")[0].trim() : "Autre"
+      formationsData.flatMap(f =>
+        f.domain
+          ? f.domain.split(",").map(d => d.trim())
+          : ["Autre"]
       )
     )
-  ).map(s => String(s))
+  ).map(s=>String(s))
 ];
 
 /* -------------------- COMPONENT -------------------- */
@@ -85,20 +87,19 @@ export default function FormationsExplorer({
   /* -------------------- FILTER -------------------- */
 
   const filteredFormations = formationsData.filter(f => {
-    const firstDomain = f.domain
-      ? f.domain.split(",")[0].trim()
-      : "Autre";
+    const domains = f.domain
+      ? f.domain.split(",").map(d => d.trim())
+      : ["Autre"];
 
     const matchesSearch =
       f.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       f.etablissement.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesSector =
-      selectedSector === "Tous" || firstDomain === selectedSector;
+      selectedSector === "Tous" || domains.includes(selectedSector);
 
     return matchesSearch && matchesSector;
   });
-
   // slice pour pagination
   const displayedFormations = filteredFormations.slice(0, page * PAGE_SIZE);
 
@@ -186,20 +187,34 @@ export default function FormationsExplorer({
                     {f.etablissement}
                   </div>
 
-                  <div className="text-xs text-gray-500 mb-3">
-                    {firstDomain}
+                  <div className="text-xs text-gray-500 mb-3 flex flex-wrap gap-2">
+                    {f.domain
+                        ? f.domain.split(",").map((d, i) => (
+                            <span
+                                key={i}
+                                className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                            >
+                              {d.trim()}
+                            </span>
+                        ))
+                      : (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                            Autre
+                        </span>
+                      )
+                    }
                   </div>
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() => onFormationClick(f.id)}
-                      className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
+                        onClick={() => onFormationClick(f.id)}
+                        className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
                     >
                       Voir le détail
                     </button>
 
                     <button
-                      onClick={() => onToggleFavorite(f.id)}
+                        onClick={() => onToggleFavorite(f.id)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                         favorite
                           ? "bg-primary-100 text-primary-600"
