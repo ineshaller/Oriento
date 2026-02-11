@@ -9,7 +9,7 @@ interface ProfileCreationProps {
 
 const grades = ['Seconde', 'Première', 'Terminale'];
 
-const specialties = [
+const specialties2 = [
   'Mathématiques',
   'Physique-Chimie',
   'SVT',
@@ -20,6 +20,21 @@ const specialties = [
   'Langues',
   'Arts',
   'Autre'
+];
+
+const specialties = [
+  'HGGSP',
+  'HLP',
+  'LLCE',
+  'LLCA',
+  'Maths',
+  'NSI',
+  'SVT',
+  'SI',
+  'SES',
+  'Physique-Chimie',
+  'Arts',
+  'Sports'
 ];
 
 const interests = [
@@ -44,11 +59,18 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
   const [selectedInterests, setSelectedInterests] = useState<string[]>(userProfile.interests || []);
 
   const toggleSpecialty = (specialty: string) => {
-    setSelectedSpecialties(prev =>
-      prev.includes(specialty)
-        ? prev.filter(s => s !== specialty)
-        : [...prev, specialty]
-    );
+    setSelectedSpecialties(prev => {
+      // Si la spécialité est déjà sélectionnée, on la retire (toujours autorisé)
+      if (prev.includes(specialty)) {
+        return prev.filter(s => s !== specialty);
+      }
+      // Sinon, si moins de 3 spécialités sélectionnées, on ajoute
+      if (prev.length < 3) {
+        return [...prev, specialty];
+      }
+      // Sinon, on ne fait rien (on peut aussi afficher un message si tu veux)
+      return prev;
+    });
   };
 
   const toggleInterest = (interestId: string) => {
