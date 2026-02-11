@@ -166,7 +166,7 @@ function App() {
     }
   };
 
-  const showBottomNav = ['dashboard', 'careers', 'chatbot', 'favorites', 'profile'].includes(currentScreen);
+  const showBottomNav = ['dashboard', 'careers', 'formations', 'chatbot', 'favorites', 'profile'].includes(currentScreen);
 
   return (
     <div className="min-h-screen bg-gray-50">

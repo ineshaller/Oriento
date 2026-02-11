@@ -1,4 +1,5 @@
 import { useState } from "react";
+// @ts-ignore
 import formationsData from "../data/formations.json";
 import {
   Search,
