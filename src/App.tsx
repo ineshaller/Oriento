@@ -3,6 +3,7 @@ import { useState } from "react";
 import SplashScreen from "./components/SplashScreen";
 import Onboarding from "./components/Onboarding";
 import ProfileCreation from "./components/ProfileCreation";
+import TestProposal from "./components/TestProposal";
 import RiasecTest from "./components/RiasecTest";
 import TestResults from "./components/TestResults";
 import Dashboard from "./components/Dashboard";
@@ -19,7 +20,8 @@ export type Screen =
   | "splash"
   | "onboarding"
   | "profile-creation"
-  | "profile-creation-edit" // ✅ AJOUT
+  | "profile-creation-edit"
+  | "test-proposal"
   | "riasec-test"
   | "test-results"
   | "dashboard"
@@ -103,19 +105,27 @@ function App() {
             userProfile={userProfile}
             onComplete={(profile) => {
               updateProfile(profile);
-              setCurrentScreen("riasec-test");
+              setCurrentScreen("test-proposal");
             }}
           />
         );
 
-      case "profile-creation-edit": // ✅ AJOUT
+      case "profile-creation-edit":
         return (
           <ProfileCreation
             userProfile={userProfile}
             onComplete={(profile) => {
               updateProfile(profile);
-              setCurrentScreen("profile"); // retour au profil, pas au test
+              setCurrentScreen("profile");
             }}
+          />
+        );
+
+      case "test-proposal": 
+        return (
+          <TestProposal
+            onTakeTest={() => setCurrentScreen("riasec-test")}
+            onSkip={() => setCurrentScreen("dashboard")}
           />
         );
 
@@ -198,7 +208,7 @@ function App() {
         );
 
       case "profile":
-        return <Profile userProfile={userProfile} onEdit={() => setCurrentScreen("profile-creation-edit")} />; // ✅ MODIFIÉ
+        return <Profile userProfile={userProfile} onEdit={() => setCurrentScreen("profile-creation-edit")} />;
 
       default:
         return (
