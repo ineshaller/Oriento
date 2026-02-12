@@ -1,3 +1,4 @@
+// Dashboard.tsx
 import { MessageCircle, Target, BookOpen, Sparkles, TrendingUp, ChevronRight } from 'lucide-react';
 import type { UserProfile, Screen } from '../App';
 
@@ -43,7 +44,7 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
             <span className="text-white font-bold">{progressPercentage}%</span>
           </div>
           <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-white rounded-full transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             />
@@ -52,9 +53,30 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
         </div>
       </div>
 
+
+      {!hasCompletedTest && (
+        <div className="px-6 mt-6">
+          <div className="bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl p-5 flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-800 mb-0.5">Passe le test RIASEC</h3>
+              <p className="text-gray-600 text-sm">Découvre les métiers qui te correspondent</p>
+            </div>
+            <button
+              onClick={() => onNavigate('riasec-test')}
+              className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl font-semibold text-sm flex-shrink-0"
+            >
+              Démarrer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="p-6 -mt-4">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ marginTop: !hasCompletedTest ? '1rem' : undefined }}>
           <button
             onClick={() => onNavigate('chatbot')}
             className="w-full p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
@@ -72,7 +94,7 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
           <button
             onClick={() => onNavigate('careers')}
             className="w-full p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
-            >
+          >
             <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center">
               <Target className="w-6 h-6 text-white" />
             </div>
@@ -116,7 +138,7 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
             <p className="text-2xl font-bold text-gray-800">{favoriteJobsCount}</p>
             <p className="text-sm text-gray-600">Métiers favoris</p>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-2">
               <BookOpen className="w-5 h-5 text-blue-600" />
@@ -132,7 +154,7 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
         <div className="px-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-gray-800">Métiers favoris</h2>
-            <button 
+            <button
               onClick={() => onNavigate('favorites')}
               className="text-sm text-primary-600 font-semibold"
             >
@@ -151,25 +173,6 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
                 <ChevronRight className="w-5 h-5 text-gray-400" />
               </button>
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* CTA if no test */}
-      {!hasCompletedTest && (
-        <div className="px-6 mt-6">
-          <div className="bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl p-6 text-center">
-            <TrendingUp className="w-12 h-12 text-primary-600 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-800 mb-2">Commence ton parcours</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              Passe le test de personnalité pour découvrir les métiers qui te correspondent
-            </p>
-            <button
-              onClick={() => onNavigate('riasec-test')}
-              className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl font-semibold"
-            >
-              Commencer le test
-            </button>
           </div>
         </div>
       )}
