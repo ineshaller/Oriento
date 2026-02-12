@@ -19,6 +19,7 @@ export type Screen =
   | "splash"
   | "onboarding"
   | "profile-creation"
+  | "profile-creation-edit" // ✅ AJOUT
   | "riasec-test"
   | "test-results"
   | "dashboard"
@@ -36,7 +37,7 @@ export interface UserProfile {
   specialties?: string[];
   interests?: string[];
   riasecProfile?: string[];
-  riasecScores?: { [key: string]: number }; // ✅ AJOUT
+  riasecScores?: { [key: string]: number };
   favoriteJobs?: string[];
   savedFormations?: string[];
 }
@@ -107,11 +108,21 @@ function App() {
           />
         );
 
+      case "profile-creation-edit": // ✅ AJOUT
+        return (
+          <ProfileCreation
+            userProfile={userProfile}
+            onComplete={(profile) => {
+              updateProfile(profile);
+              setCurrentScreen("profile"); // retour au profil, pas au test
+            }}
+          />
+        );
+
       case "riasec-test":
         return (
           <RiasecTest
             onComplete={(results, scores) => {
-              // ✅ stocke les DEUX
               updateProfile({ riasecProfile: results, riasecScores: scores });
               setCurrentScreen("test-results");
             }}
@@ -122,7 +133,7 @@ function App() {
         return (
           <TestResults
             riasecProfile={userProfile.riasecProfile || []}
-            scores={userProfile.riasecScores} // ✅ IMPORTANT
+            scores={userProfile.riasecScores}
             onExplore={() => setCurrentScreen("careers")}
             onChat={() => setCurrentScreen("chatbot")}
           />
@@ -187,7 +198,7 @@ function App() {
         );
 
       case "profile":
-        return <Profile userProfile={userProfile} onEdit={() => setCurrentScreen("profile-creation")} />;
+        return <Profile userProfile={userProfile} onEdit={() => setCurrentScreen("profile-creation-edit")} />; // ✅ MODIFIÉ
 
       default:
         return (
