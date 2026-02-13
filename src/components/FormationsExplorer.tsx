@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 // @ts-ignore
-import formationsData from "../data/formations.json";
 import {
   Search,
   GraduationCap,
@@ -57,21 +56,6 @@ function getIconFromDomain(domain: string) {
   return domainConfig[domain] || domainConfig["Autre"];
 }
 
-/* -------------------- SECTORS -------------------- */
-
-const sectors: string[] = [
-  "Tous",
-  ...Array.from(
-    new Set(
-      formationsData.flatMap(f =>
-        f.domain
-          ? f.domain.split(",").map(d => d.trim())
-          : ["Autre"]
-      )
-    )
-  ).map(s=>String(s))
-];
-
 /* -------------------- COMPONENT -------------------- */
 
 export default function FormationsExplorer({
@@ -80,16 +64,56 @@ export default function FormationsExplorer({
   onToggleFavorite
 }: FormationsExplorerProps) {
 
+  const [formationsData, setFormationsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedSector, setSelectedSector] = useState<string>("Tous");
-  const [page, setPage] = useState<number>(1); // page actuelle
-  const PAGE_SIZE = 50; // nombre de formations par page
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 50;
+
+  /* -------------------- FETCH DATA -------------------- */
+
+  useEffect(() => {
+    fetch("/data/formations_final.json")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erreur chargement formations");
+        }
+        return res.json();
+      })
+      .then(data => {
+        setFormationsData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  /* -------------------- SECTORS -------------------- */
+
+  const sectors = useMemo(() => {
+    return [
+      "Tous",
+      ...Array.from(
+        new Set(
+          formationsData.flatMap(f =>
+            f.domain
+              ? f.domain.split(",").map((d: string) => d.trim())
+              : ["Autre"]
+          )
+        )
+      )
+    ];
+  }, [formationsData]);
 
   /* -------------------- FILTER -------------------- */
 
   const filteredFormations = formationsData.filter(f => {
     const domains = f.domain
-      ? f.domain.split(",").map(d => d.trim())
+      ? f.domain.split(",").map((d: string) => d.trim())
       : ["Autre"];
 
     const matchesSearch =
@@ -101,12 +125,22 @@ export default function FormationsExplorer({
 
     return matchesSearch && matchesSector;
   });
-  // slice pour pagination
+
   const displayedFormations = filteredFormations.slice(0, page * PAGE_SIZE);
 
   const isFavorite = (formationId: string) => {
     return userProfile.favoriteJobs?.includes(formationId);
   };
+
+  /* -------------------- LOADING STATE -------------------- */
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Chargement des formations...
+      </div>
+    );
+  }
 
   /* -------------------- RENDER -------------------- */
 
@@ -127,7 +161,7 @@ export default function FormationsExplorer({
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              setPage(1); // reset page si recherche change
+              setPage(1);
             }}
             placeholder="Rechercher une formation..."
             className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary-300"
@@ -141,7 +175,7 @@ export default function FormationsExplorer({
               key={sector}
               onClick={() => {
                 setSelectedSector(sector);
-                setPage(1); // reset page si secteur change
+                setPage(1);
               }}
               className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedSector === sector
@@ -173,12 +207,10 @@ export default function FormationsExplorer({
             >
               <div className="flex items-start gap-4">
 
-                {/* ICON */}
                 <div className="w-14 h-14 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-7 h-7 text-white" />
                 </div>
 
-                {/* CONTENT */}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-800 mb-1">
                     {f.title}
@@ -190,17 +222,17 @@ export default function FormationsExplorer({
 
                   <div className="text-xs text-gray-500 mb-3 flex flex-wrap gap-2">
                     {f.domain
-                        ? f.domain.split(",").map((d, i) => (
-                            <span
-                                key={i}
-                                className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                            >
-                              {d.trim()}
-                            </span>
+                      ? f.domain.split(",").map((d: string, i: number) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                          >
+                            {d.trim()}
+                          </span>
                         ))
                       : (
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
-                            Autre
+                          Autre
                         </span>
                       )
                     }
@@ -208,14 +240,14 @@ export default function FormationsExplorer({
 
                   <div className="flex gap-2">
                     <button
-                        onClick={() => onFormationClick(f.id)}
-                        className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
+                      onClick={() => onFormationClick(f.id)}
+                      className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
                     >
                       Voir le détail
                     </button>
 
                     <button
-                        onClick={() => onToggleFavorite(f.id)}
+                      onClick={() => onToggleFavorite(f.id)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                         favorite
                           ? "bg-primary-100 text-primary-600"
