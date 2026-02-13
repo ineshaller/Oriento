@@ -50,7 +50,7 @@ console.log(`Formations uniques après dédoublonnage: ${filteredFormations.leng
 
 // --- Écrire le JSON final ---
 const outputDir = path.join(__dirname, "../public/data");
-const outputPath = path.join(__dirname, "formations_final.json");
+const outputPath = path.join(outputDir, "formations_final.json");
 fs.writeFileSync(outputPath, JSON.stringify(filteredFormations, null, 2));
 
 console.log(`JSON final généré avec stats (${filteredFormations.length} formations)`);
