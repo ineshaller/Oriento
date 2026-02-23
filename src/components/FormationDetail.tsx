@@ -204,6 +204,21 @@ export default function FormationDetail({
           </section>
         )}
 
+        {formation.stats && (
+          <section>
+            <h2 className="text-xl font-bold mb-3">Informations clés et statistiques de l'année précédente</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-0 text-sm">
+              <div><strong>Ville :</strong> {formation.stats.ville_etab}</div>
+              <div><strong>Région :</strong> {formation.stats.region_etab_aff}</div>
+              <div><strong>Type :</strong> {formation.stats.select_form}</div>
+              <div><strong>Capacité :</strong> {formation.stats.capa_fin}</div>
+              <div><strong>Nombre de vœux :</strong> {formation.stats.voe_tot}</div>
+              <div><strong>Nombre d’admis :</strong> {formation.stats.acc_tot}</div>
+              <div><strong>Taux d’accès :</strong> {formation.stats.taux_acces_ens}%</div>
+            </div>
+          </section>
+        )}
+
         {formation.education?.length > 0 && (
           <section>
             <h2 className="text-xl font-bold mb-3">Formations possibles</h2>
@@ -214,17 +229,38 @@ export default function FormationDetail({
             ))}
           </section>
         )}
+        {formation.links && (
+          <section>
+            <h2 className="text-xl font-bold mb-3">Liens utiles</h2>
+            <ul className="space-y-2 text-primary-600 underline">
+              {formation.links.ficheFormation && (
+                <li>
+                  <a href={formation.links.ficheFormation} target="_blank" rel="noreferrer">
+                    Fiche formation Parcoursup
+                  </a>
+                </li>
+              )}
+              
+              {formation.links.site && (
+                <li>
+                  <a href={formation.links.site} target="_blank" rel="noreferrer">
+                    Site de l’établissement
+                  </a>
+                </li>
+              )}
+            </ul>
+          </section>
+        )}
       </div>
 
       {/* CTA */}
-      <div className="fixed bottom-20 left-0 right-0 p-6 bg-white">
-        <button
-          onClick={onChat}
-          className="w-full max-w-md mx-auto bg-primary-500 text-white py-4 rounded-2xl flex items-center justify-center gap-2"
-        >
-          <MessageCircle className="w-5 h-5" />
-          Discuter avec le chatbot
-        </button>
+      <div className="fixed bottom-20 left-0 right-0 p-6 bg-white"> 
+        <button onClick={onChat} className="w-full max-w-md mx-auto bg-primary-500 text-white py-4 rounded-2xl flex items-center justify-center gap-2" > 
+          <MessageCircle className="w-5 h-5" /> Discuter avec le chatbot </button> 
+      </div>
+
+      <div className="pb-24">
+        {/* contenu de la page */}
       </div>
     </div>
   );
