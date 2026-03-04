@@ -1,6 +1,20 @@
-import { useState } from 'react';
-import { Search, Briefcase, Code, Heart, Palette, Building, GraduationCap, BookmarkPlus, Bookmark } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, BookmarkPlus, Bookmark, ExternalLink } from 'lucide-react';
 import type { UserProfile } from '../App';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface Career {
+  id: string;
+  title: string;
+  url_onisep: string;
+  sector: string;
+  gfe: string;
+  rome_codes: string[];
+  rome_labels: string[];
+  publication: string;
+  domaines: string[];
+}
 
 interface CareersExplorerProps {
   userProfile: UserProfile;
@@ -8,123 +22,137 @@ interface CareersExplorerProps {
   onToggleFavorite: (jobId: string) => void;
 }
 
-const careers = [
-  {
-    id: 'dev-web',
-    title: 'Développeur Web',
-    sector: 'Technologies',
-    education: 'Bac+2 à Bac+5',
-    icon: Code,
-    color: 'from-blue-400 to-blue-500',
-    riasec: ['I', 'R', 'C']
-  },
-  {
-    id: 'medecin',
-    title: 'Médecin',
-    sector: 'Santé',
-    education: 'Bac+9 à Bac+11',
-    icon: Heart,
-    color: 'from-red-400 to-red-500',
-    riasec: ['I', 'S']
-  },
-  {
-    id: 'designer',
-    title: 'Designer UX/UI',
-    sector: 'Création',
-    education: 'Bac+3 à Bac+5',
-    icon: Palette,
-    color: 'from-primary-400 to-primary-500',
-    riasec: ['A', 'I']
-  },
-  {
-    id: 'architecte',
-    title: 'Architecte',
-    sector: 'Construction',
-    education: 'Bac+5 à Bac+7',
-    icon: Building,
-    color: 'from-gray-400 to-gray-500',
-    riasec: ['A', 'R', 'I']
-  },
-  {
-    id: 'prof',
-    title: 'Professeur',
-    sector: 'Éducation',
-    education: 'Bac+5',
-    icon: GraduationCap,
-    color: 'from-green-400 to-green-500',
-    riasec: ['S', 'A']
-  },
-  {
-    id: 'ingenieur',
-    title: 'Ingénieur',
-    sector: 'Technologies',
-    education: 'Bac+5',
-    icon: Briefcase,
-    color: 'from-indigo-400 to-indigo-500',
-    riasec: ['I', 'R', 'E']
-  },
-  {
-    id: 'psychologue',
-    title: 'Psychologue',
-    sector: 'Santé',
-    education: 'Bac+5',
-    icon: Heart,
-    color: 'from-pink-400 to-pink-500',
-    riasec: ['S', 'I']
-  },
-  {
-    id: 'chef-projet',
-    title: 'Chef de Projet',
-    sector: 'Management',
-    education: 'Bac+5',
-    icon: Briefcase,
-    color: 'from-orange-400 to-orange-500',
-    riasec: ['E', 'S', 'C']
-  }
+// ─── Data ─────────────────────────────────────────────────────────────────────
+// Importez directement le JSON généré depuis le CSV ONISEP :
+// import careersData from '../data/careers_onisep.json';
+//
+// Ou chargez-le dynamiquement (voir hook useCareerData ci-dessous).
+// Pour l'exemple, on utilise un import statique :
+
+import careersData from '../data/metiers.json';
+const careers: Career[] = careersData as Career[];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Retourne une couleur Tailwind selon le secteur */
+function sectorColor(sector: string): string {
+  const map: Record<string, string> = {
+    'Informatique & Numérique': 'from-blue-400 to-blue-600',
+    'Santé & Social':           'from-red-400 to-red-600',
+    'Commerce & Gestion':       'from-orange-400 to-orange-600',
+    'Communication & Médias':   'from-purple-400 to-purple-600',
+    'Enseignement':             'from-green-400 to-green-600',
+    'Bâtiment':                 'from-stone-400 to-stone-600',
+    'Transport & Logistique':   'from-sky-400 to-sky-600',
+    'Hôtellerie & Tourisme':    'from-yellow-400 to-yellow-600',
+    'Agriculture':              'from-lime-400 to-lime-600',
+    'Chimie & Biologie':        'from-teal-400 to-teal-600',
+    'Administration':           'from-slate-400 to-slate-600',
+    'Sécurité & Défense':       'from-zinc-500 to-zinc-700',
+  };
+  return map[sector] ?? 'from-gray-400 to-gray-600';
+}
+
+/** Initiales du secteur pour l'avatar */
+function sectorInitials(sector: string): string {
+  return sector
+    .split(/[\s&]+/)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
+const ALL_SECTORS = [
+  'Tous',
+  'Administration',
+  'Agriculture',
+  'Agroalimentaire',
+  'Bois & Matériaux',
+  'Bâtiment',
+  'Chimie & Biologie',
+  'Commerce & Gestion',
+  'Communication & Médias',
+  'Enseignement',
+  'Hôtellerie & Tourisme',
+  'Imprimerie & Graphisme',
+  'Informatique & Numérique',
+  'Mécanique',
+  'Métallurgie',
+  'Production industrielle',
+  'Pêche & Mer',
+  'Santé & Social',
+  'Sécurité & Défense',
+  'Textile & Mode',
+  'Transport & Logistique',
+  'Électricité & Énergie',
 ];
 
-const sectors = ['Tous', 'Technologies', 'Santé', 'Création', 'Éducation', 'Management', 'Construction'];
+const PAGE_SIZE = 30;
 
-export default function CareersExplorer({ userProfile, onCareerClick, onToggleFavorite }: CareersExplorerProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function CareersExplorer({
+  userProfile,
+  onCareerClick,
+  onToggleFavorite,
+}: CareersExplorerProps) {
+  const [searchTerm, setSearchTerm]       = useState('');
   const [selectedSector, setSelectedSector] = useState('Tous');
+  const [page, setPage]                   = useState(1);
 
-  const filteredCareers = careers.filter(career => {
-    const matchesSearch = career.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         career.sector.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSector = selectedSector === 'Tous' || career.sector === selectedSector;
-    return matchesSearch && matchesSector;
-  });
+  const filtered = useMemo(() => {
+    const q = searchTerm.toLowerCase();
+    return careers.filter(c => {
+      const matchesSearch =
+        !q ||
+        c.title.toLowerCase().includes(q) ||
+        c.sector.toLowerCase().includes(q) ||
+        c.rome_labels.some(r => r.toLowerCase().includes(q)) ||
+        c.domaines.some(d => d.toLowerCase().includes(q));
+      const matchesSector = selectedSector === 'Tous' || c.sector === selectedSector;
+      return matchesSearch && matchesSector;
+    });
+  }, [searchTerm, selectedSector]);
 
-  const isFavorite = (careerId: string) => {
-    return userProfile.favoriteJobs?.includes(careerId);
-  };
+  const paginated = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore   = paginated.length < filtered.length;
+
+  const isFavorite = (id: string) => userProfile.favoriteJobs?.includes(id) ?? false;
+
+  // Reset page on filter change
+  const handleSearch = (v: string) => { setSearchTerm(v); setPage(1); };
+  const handleSector = (s: string) => { setSelectedSector(s); setPage(1); };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-white p-6 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Explorer les métiers</h1>
-        
+      <div className="bg-white p-6 pb-4 sticky top-0 z-10 shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          Explorer les métiers
+          <span className="ml-2 text-sm font-normal text-gray-400">
+            ({filtered.length} résultats)
+          </span>
+        </h1>
+
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Rechercher un métier..."
+            onChange={e => handleSearch(e.target.value)}
+            placeholder="Rechercher un métier, un domaine…"
             className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
 
         {/* Sector filters */}
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
-          {sectors.map(sector => (
+          {ALL_SECTORS.map(sector => (
             <button
               key={sector}
-              onClick={() => setSelectedSector(sector)}
-              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
+              onClick={() => handleSector(sector)}
+              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors text-sm ${
                 selectedSector === sector
                   ? 'bg-primary-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -138,43 +166,48 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
 
       {/* Career cards */}
       <div className="p-6 space-y-3">
-        {filteredCareers.map(career => {
-          const Icon = career.icon;
+        {paginated.map(career => {
           const favorite = isFavorite(career.id);
-          
+
           return (
             <div
               key={career.id}
               className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start gap-4">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${career.color} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="w-7 h-7 text-white" />
-                </div>
-                
+              <div className="flex items-start">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-800 mb-1">{career.title}</h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-gray-600">{career.sector}</span>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-600">{career.education}</span>
-                  </div>
-                  
-                  <div className="flex gap-2 mb-3">
-                    {career.riasec.map(code => (
-                      <span
-                        key={code}
-                        className={`px-2 py-1 text-xs font-medium rounded-md ${
-                          userProfile.riasecProfile?.includes(code)
-                            ? 'bg-primary-100 text-primary-700'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {code}
-                      </span>
-                    ))}
-                  </div>
 
+                  {/* Title */}
+                  <h3 className="font-bold text-gray-800 mb-1 leading-snug capitalize">
+                    {career.title}
+                  </h3>
+
+                  {/* Sector */}
+                  <p className="text-sm text-gray-500 mb-2">{career.sector}</p>
+
+                  {/* ROME codes */}
+                  {career.rome_codes.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {career.rome_codes.map((code, i) => (
+                        <span
+                          key={code}
+                          title={career.rome_labels[i] ?? ''}
+                          className="px-2 py-0.5 text-xs font-mono bg-gray-100 text-gray-600 rounded-md"
+                        >
+                          {code}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Domaines */}
+                  {career.domaines.length > 0 && (
+                    <p className="text-xs text-gray-400 mb-3 line-clamp-1">
+                      {career.domaines.join(' · ')}
+                    </p>
+                  )}
+
+                  {/* Actions */}
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCareerClick(career.id)}
@@ -182,6 +215,18 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
                     >
                       Voir le détail
                     </button>
+
+                    {/* Lien ONISEP direct */}
+                    <a
+                      href={career.url_onisep}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors"
+                      title="Voir sur ONISEP"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+
                     <button
                       onClick={() => onToggleFavorite(career.id)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
@@ -190,7 +235,9 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
                           : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                       }`}
                     >
-                      {favorite ? <Bookmark className="w-5 h-5 fill-current" /> : <BookmarkPlus className="w-5 h-5" />}
+                      {favorite
+                        ? <Bookmark className="w-5 h-5 fill-current" />
+                        : <BookmarkPlus className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
@@ -200,7 +247,19 @@ export default function CareersExplorer({ userProfile, onCareerClick, onToggleFa
         })}
       </div>
 
-      {filteredCareers.length === 0 && (
+      {/* Load more */}
+      {hasMore && (
+        <div className="flex justify-center pb-6">
+          <button
+            onClick={() => setPage(p => p + 1)}
+            className="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm"
+          >
+            Charger plus ({filtered.length - paginated.length} restants)
+          </button>
+        </div>
+      )}
+
+      {filtered.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Aucun métier trouvé</p>
         </div>

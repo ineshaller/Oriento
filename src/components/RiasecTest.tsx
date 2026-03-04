@@ -116,9 +116,6 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
         </div>
 
         <div className="mt-2 text-center">
-          <span className="text-xs text-gray-400">
-            Question {currentQuestion + 1} - Catégorie: {questions[currentQuestion].category}
-          </span>
         </div>
       </div>
 
@@ -127,31 +124,31 @@ export default function RiasecTest({ onComplete }: RiasecTestProps) {
           onClick={() => handleAnswer(5)}
           className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
         >
-          Tout à fait d'accord <span className="text-xs text-gray-500">(+5 pts)</span>
+          Tout à fait d'accord <span className="text-xs text-gray-500"></span>
         </button>
         <button
           onClick={() => handleAnswer(4)}
           className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
         >
-          Plutôt d'accord <span className="text-xs text-gray-500">(+4 pts)</span>
+          Plutôt d'accord <span className="text-xs text-gray-500"></span>
         </button>
         <button
           onClick={() => handleAnswer(3)}
           className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
         >
-          Neutre <span className="text-xs text-gray-500">(+3 pts)</span>
+          Neutre <span className="text-xs text-gray-500"></span>
         </button>
         <button
           onClick={() => handleAnswer(2)}
           className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
         >
-          Plutôt en désaccord <span className="text-xs text-gray-500">(+2 pts)</span>
+          Plutôt en désaccord <span className="text-xs text-gray-500"></span>
         </button>
         <button
           onClick={() => handleAnswer(1)}
           className="w-full py-4 rounded-2xl font-semibold bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-all"
         >
-          Pas du tout d'accord <span className="text-xs text-gray-500">(+1 pt)</span>
+          Pas du tout d'accord <span className="text-xs text-gray-500"></span>
         </button>
       </div>
     </div>

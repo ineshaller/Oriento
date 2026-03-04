@@ -40,8 +40,21 @@ export interface UserProfile {
   interests?: string[];
   riasecProfile?: string[];
   riasecScores?: { [key: string]: number };
+  riasecPrimaryCount?: number; // nombre de profils principaux (1, 2 ou 3 en cas d'égalité)
   favoriteJobs?: string[];
   savedFormations?: string[];
+}
+
+/** Calcule combien de codes partagent le score maximum (= profils principaux) */
+function computePrimaryCount(scores: { [key: string]: number }, orderedCodes: string[]): number {
+  if (!orderedCodes.length) return 1;
+  const topScore = scores[orderedCodes[0]];
+  let count = 0;
+  for (const code of orderedCodes) {
+    if (scores[code] === topScore) count++;
+    else break;
+  }
+  return Math.max(1, count);
 }
 
 function App() {
@@ -51,6 +64,7 @@ function App() {
     savedFormations: [],
     riasecProfile: [],
     riasecScores: undefined,
+    riasecPrimaryCount: 1,
   });
   const [selectedCareer, setSelectedCareer] = useState<string | null>(null);
   const [selectedFormation, setSelectedFormation] = useState<string | null>(null);
@@ -121,7 +135,7 @@ function App() {
           />
         );
 
-      case "test-proposal": 
+      case "test-proposal":
         return (
           <TestProposal
             onTakeTest={() => setCurrentScreen("riasec-test")}
@@ -133,7 +147,14 @@ function App() {
         return (
           <RiasecTest
             onComplete={(results, scores) => {
-              updateProfile({ riasecProfile: results, riasecScores: scores });
+              const primaryCount = scores
+                ? computePrimaryCount(scores, results)
+                : 1;
+              updateProfile({
+                riasecProfile: results,
+                riasecScores: scores,
+                riasecPrimaryCount: primaryCount,
+              });
               setCurrentScreen("test-results");
             }}
           />
@@ -186,6 +207,7 @@ function App() {
           <FormationsExplorer
             userProfile={userProfile}
             onFormationClick={navigateToFormationDetail}
+            onToggleFavorite={toggleSavedFormation}
           />
         );
 

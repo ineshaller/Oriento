@@ -58,17 +58,23 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>(userProfile.specialties || []);
   const [selectedInterests, setSelectedInterests] = useState<string[]>(userProfile.interests || []);
 
+  const isSeconde = grade === 'Seconde';
+  const totalSteps = isSeconde ? 3 : 4;
+
+  // Map visual step number to actual step index
+  const getVisualStep = () => {
+    if (isSeconde && step === 4) return 3;
+    return step;
+  };
+
   const toggleSpecialty = (specialty: string) => {
     setSelectedSpecialties(prev => {
-      // Si la spécialité est déjà sélectionnée, on la retire (toujours autorisé)
       if (prev.includes(specialty)) {
         return prev.filter(s => s !== specialty);
       }
-      // Sinon, si moins de 3 spécialités sélectionnées, on ajoute
       if (prev.length < 3) {
         return [...prev, specialty];
       }
-      // Sinon, on ne fait rien (on peut aussi afficher un message si tu veux)
       return prev;
     });
   };
@@ -82,7 +88,10 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
   };
 
   const handleNext = () => {
-    if (step < 4) {
+    if (step === 2 && grade === 'Seconde') {
+      // Skip specialties step for Seconde students
+      setStep(4);
+    } else if (step < 4) {
       setStep(step + 1);
     } else {
       onComplete({
@@ -109,16 +118,16 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex items-center gap-2 mb-4">
-          {[1, 2, 3, 4].map(num => (
+          {Array.from({ length: totalSteps }).map((_, i) => (
             <div
-              key={num}
+              key={i}
               className={`flex-1 h-1.5 rounded-full transition-colors ${
-                num <= step ? 'bg-primary-500' : 'bg-gray-200'
+                i + 1 <= getVisualStep() ? 'bg-primary-500' : 'bg-gray-200'
               }`}
             />
           ))}
         </div>
-        <p className="text-sm text-gray-500">Étape {step} sur 4</p>
+        <p className="text-sm text-gray-500">Étape {getVisualStep()} sur {totalSteps}</p>
       </div>
 
       {/* Content */}
