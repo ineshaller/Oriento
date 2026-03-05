@@ -29,7 +29,7 @@ interface CareersExplorerProps {
 // Ou chargez-le dynamiquement (voir hook useCareerData ci-dessous).
 // Pour l'exemple, on utilise un import statique :
 
-import careersData from '../data/metiers.json';
+import careersData from '../data/careers_onisep.json';
 const careers: Career[] = careersData as Career[];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -129,9 +129,6 @@ export default function CareersExplorer({
       <div className="bg-white p-6 pb-4 sticky top-0 z-10 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Explorer les métiers
-          <span className="ml-2 text-sm font-normal text-gray-400">
-            ({filtered.length} résultats)
-          </span>
         </h1>
 
         {/* Search */}
@@ -184,21 +181,6 @@ export default function CareersExplorer({
 
                   {/* Sector */}
                   <p className="text-sm text-gray-500 mb-2">{career.sector}</p>
-
-                  {/* ROME codes */}
-                  {career.rome_codes.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {career.rome_codes.map((code, i) => (
-                        <span
-                          key={code}
-                          title={career.rome_labels[i] ?? ''}
-                          className="px-2 py-0.5 text-xs font-mono bg-gray-100 text-gray-600 rounded-md"
-                        >
-                          {code}
-                        </span>
-                      ))}
-                    </div>
-                  )}
 
                   {/* Domaines */}
                   {career.domaines.length > 0 && (

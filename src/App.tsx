@@ -40,12 +40,11 @@ export interface UserProfile {
   interests?: string[];
   riasecProfile?: string[];
   riasecScores?: { [key: string]: number };
-  riasecPrimaryCount?: number; // nombre de profils principaux (1, 2 ou 3 en cas d'égalité)
+  riasecPrimaryCount?: number;
   favoriteJobs?: string[];
   savedFormations?: string[];
 }
 
-/** Calcule combien de codes partagent le score maximum (= profils principaux) */
 function computePrimaryCount(scores: { [key: string]: number }, orderedCodes: string[]): number {
   if (!orderedCodes.length) return 1;
   const topScore = scores[orderedCodes[0]];
@@ -147,9 +146,7 @@ function App() {
         return (
           <RiasecTest
             onComplete={(results, scores) => {
-              const primaryCount = scores
-                ? computePrimaryCount(scores, results)
-                : 1;
+              const primaryCount = scores ? computePrimaryCount(scores, results) : 1;
               updateProfile({
                 riasecProfile: results,
                 riasecScores: scores,
@@ -226,6 +223,7 @@ function App() {
             userProfile={userProfile}
             onCareerClick={navigateToCareerDetail}
             onToggleFavorite={toggleFavoriteJob}
+            onToggleFormation={toggleSavedFormation}
           />
         );
 

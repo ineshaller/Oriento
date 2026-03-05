@@ -1,7 +1,8 @@
-import { Bookmark } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Bookmark, GraduationCap, Briefcase } from 'lucide-react';
 import type { UserProfile } from '../App';
 import type { Career } from './CareersExplorer';
-import careersData from '../data/metiers.json';
+import careersData from '../data/careers_enriched.json';
 
 const careers: Career[] = careersData as Career[];
 
@@ -9,6 +10,7 @@ interface FavoritesProps {
   userProfile: UserProfile;
   onCareerClick: (careerId: string) => void;
   onToggleFavorite: (jobId: string) => void;
+  onToggleFormation: (formationId: string) => void;
 }
 
 function sectorColor(sector: string): string {
@@ -29,84 +31,163 @@ function sectorColor(sector: string): string {
   return map[sector] ?? 'from-gray-400 to-gray-600';
 }
 
-function sectorInitials(sector: string): string {
-  return sector
-    .split(/[\s&]+/)
-    .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('');
-}
+export default function Favorites({ userProfile, onCareerClick, onToggleFavorite, onToggleFormation }: FavoritesProps) {
+  const favoriteJobIds    = userProfile.favoriteJobs    || [];
+  const savedFormationIds = userProfile.savedFormations || [];
 
-export default function Favorites({ userProfile, onCareerClick, onToggleFavorite }: FavoritesProps) {
-  const favoriteJobs = userProfile.favoriteJobs || [];
-
-  // Récupère les vraies données du métier depuis le JSON
-  const favoriteCareerObjects = favoriteJobs
+  // Métiers
+  const favoriteCareerObjects = favoriteJobIds
     .map(id => careers.find(c => c.id === id))
     .filter((c): c is Career => c !== undefined);
 
+  // Formations — chargées depuis le JSON public
+  const [allFormations, setAllFormations] = useState<any[]>([]);
+  useEffect(() => {
+    if (savedFormationIds.length === 0) return;
+    fetch('/data/formations_final.json')
+      .then(r => r.json())
+      .then(data => setAllFormations(data))
+      .catch(() => {});
+  }, [savedFormationIds.length]);
+
+  const savedFormationObjects = savedFormationIds.map(id => allFormations.find(f => f.id === id));
+
+  const hasNothing = favoriteCareerObjects.length === 0 && savedFormationIds.length === 0;
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+
       {/* Header */}
-      <div className="bg-white p-6 border-b border-gray-200">
+      <div className="bg-white p-6 border-b border-gray-100 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-800">Mes favoris</h1>
-        <p className="text-gray-600 text-sm mt-1">
-          {favoriteJobs.length} métier{favoriteJobs.length > 1 ? 's' : ''} sauvegardé{favoriteJobs.length > 1 ? 's' : ''}
+        <p className="text-gray-500 text-sm mt-1">
+          {favoriteCareerObjects.length} métier{favoriteCareerObjects.length > 1 ? 's' : ''}
+          {savedFormationIds.length > 0 && ` · ${savedFormationIds.length} formation${savedFormationIds.length > 1 ? 's' : ''}`}
         </p>
       </div>
 
-      {/* Content */}
-      {favoriteCareerObjects.length === 0 ? (
+      {/* Vide */}
+      {hasNothing && (
         <div className="flex flex-col items-center justify-center py-20 px-6">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <Bookmark className="w-12 h-12 text-gray-400" />
+            <Bookmark className="w-12 h-12 text-gray-300" />
           </div>
           <h2 className="text-xl font-bold text-gray-800 mb-2">Aucun favori</h2>
-          <p className="text-gray-600 text-center">
-            Explore les métiers et sauvegarde ceux qui t'intéressent
+          <p className="text-gray-500 text-center text-sm">
+            Explore les métiers et formations et sauvegarde ceux qui t'intéressent
           </p>
         </div>
-      ) : (
-        <div className="p-6 space-y-3">
-          {favoriteCareerObjects.map(career => (
-            <div
-              key={career.id}
-              className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center gap-4">
-                {/* Avatar secteur */}
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${sectorColor(career.sector)} flex items-center justify-center flex-shrink-0`}>
-                  <span className="text-white font-bold text-sm">
-                    {sectorInitials(career.sector)}
-                  </span>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-800 mb-1 capitalize leading-snug">
-                    {career.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">{career.sector}</p>
-                </div>
-
-                <div className="flex gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => onCareerClick(career.id)}
-                    className="px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
-                  >
-                    Voir
-                  </button>
-                  <button
-                    onClick={() => onToggleFavorite(career.id)}
-                    className="w-10 h-10 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center hover:bg-primary-200 transition-colors"
-                  >
-                    <Bookmark className="w-5 h-5 fill-current" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       )}
+
+      <div className="p-4 space-y-6">
+
+        {/* ── Métiers ── */}
+        {favoriteCareerObjects.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <Briefcase className="w-4 h-4 text-primary-500" />
+              <h2 className="text-base font-bold text-gray-800">Métiers sauvegardés</h2>
+              <span className="ml-auto text-xs text-gray-400 font-medium">{favoriteCareerObjects.length}</span>
+            </div>
+            <div className="space-y-2">
+              {favoriteCareerObjects.map(career => (
+                <div key={career.id} className="bg-white rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-800 text-sm capitalize leading-snug line-clamp-2">
+                        {career.title}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-0.5">{career.sector}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => onCareerClick(career.id)}
+                        className="px-3 py-2 bg-primary-500 text-white rounded-xl text-xs font-semibold hover:bg-primary-600 transition-colors"
+                      >
+                        Voir
+                      </button>
+                      <button
+                        onClick={() => onToggleFormation(fid)}
+                        className="w-9 h-9 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors flex-shrink-0"
+                        title="Retirer des favoris"
+                      >
+                        <Bookmark className="w-4 h-4 fill-current" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Formations ── */}
+        {savedFormationIds.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <GraduationCap className="w-4 h-4 text-emerald-500" />
+              <h2 className="text-base font-bold text-gray-800">Formations sauvegardées</h2>
+              <span className="ml-auto text-xs text-gray-400 font-medium">{savedFormationIds.length}</span>
+            </div>
+            <div className="space-y-2">
+              {savedFormationIds.map((fid, i) => {
+                const f = savedFormationObjects[i];
+                return (
+                  <div key={fid} className="bg-white rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                     
+                      <div className="flex-1 min-w-0">
+                        {f ? (
+                          <>
+                            <h3 className="font-bold text-gray-800 text-sm leading-snug line-clamp-2">
+                              {f.title}
+                            </h3>
+                            {f.etablissement && (
+                              <p className="text-xs text-gray-400 mt-0.5">{f.etablissement}</p>
+                            )}
+                            {f.domain && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {f.domain.split(',').slice(0, 2).map((d: string, j: number) => (
+                                  <span key={j} className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-medium">
+                                    {d.trim()}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <div className="h-3.5 bg-gray-100 rounded animate-pulse w-3/4" />
+                            <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => onToggleFormation(fid)}
+                        className="w-9 h-9 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors flex-shrink-0"
+                        title="Retirer des favoris"
+                      >
+                        <Bookmark className="w-4 h-4 fill-current" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Invite formations si aucune */}
+        {favoriteCareerObjects.length > 0 && savedFormationIds.length === 0 && (
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+            <GraduationCap className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <p className="text-sm text-emerald-700">
+              Pas encore de formations sauvegardées — explore l'onglet Formations !
+            </p>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
