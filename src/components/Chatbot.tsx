@@ -581,7 +581,7 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
           `,
           sender: "bot",
           suggestions: [
-            "🌍 Voir les fomations liés",
+            "🌍 Voir les formations liés",
             "💼 Voir les métiers liés",
             "🔄 Retour"
           ]
@@ -595,13 +595,12 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
     }
 
     /* ===== STUDY DETAIL ===== */
-
     if (step === "study_detail") {
 
-      if (userMessage.includes("domaines")) {
+      if (userMessage.includes("formations")) {
 
         if (selectedStudyType) {
-          localStorage.setItem("formationFilter", selectedStudyType);
+          window.location.href = `/formations?search=${encodeURIComponent(selectedStudyType)}`;
         }
 
         onNavigate("formations");
