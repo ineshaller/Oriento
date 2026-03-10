@@ -214,6 +214,8 @@ function App() {
             formationId={selectedFormation || ""}
             userProfile={userProfile}
             onBack={() => setCurrentScreen("formations")}
+            onToggleFavorite={toggleSavedFormation}
+            onChat={() => setCurrentScreen("chatbot")}
           />
         );
 
@@ -224,6 +226,7 @@ function App() {
             onCareerClick={navigateToCareerDetail}
             onToggleFavorite={toggleFavoriteJob}
             onToggleFormation={toggleSavedFormation}
+            onFormationClick={navigateToFormationDetail}
           />
         );
 

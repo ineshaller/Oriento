@@ -11,6 +11,7 @@ interface FavoritesProps {
   onCareerClick: (careerId: string) => void;
   onToggleFavorite: (jobId: string) => void;
   onToggleFormation: (formationId: string) => void;
+  onFormationClick?: (formationId: string) => void;
 }
 
 function sectorColor(sector: string): string {
@@ -31,16 +32,14 @@ function sectorColor(sector: string): string {
   return map[sector] ?? 'from-gray-400 to-gray-600';
 }
 
-export default function Favorites({ userProfile, onCareerClick, onToggleFavorite, onToggleFormation }: FavoritesProps) {
+export default function Favorites({ userProfile, onCareerClick, onToggleFavorite, onToggleFormation, onFormationClick }: FavoritesProps) {
   const favoriteJobIds    = userProfile.favoriteJobs    || [];
   const savedFormationIds = userProfile.savedFormations || [];
 
-  // Métiers
   const favoriteCareerObjects = favoriteJobIds
     .map(id => careers.find(c => c.id === id))
     .filter((c): c is Career => c !== undefined);
 
-  // Formations — chargées depuis le JSON public
   const [allFormations, setAllFormations] = useState<any[]>([]);
   useEffect(() => {
     if (savedFormationIds.length === 0) return;
@@ -51,8 +50,6 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
   }, [savedFormationIds.length]);
 
   const savedFormationObjects = savedFormationIds.map(id => allFormations.find(f => f.id === id));
-
-  const hasNothing = favoriteCareerObjects.length === 0 && savedFormationIds.length === 0;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -66,29 +63,24 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
         </p>
       </div>
 
-      {/* Vide */}
-      {hasNothing && (
-        <div className="flex flex-col items-center justify-center py-20 px-6">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <Bookmark className="w-12 h-12 text-gray-300" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Aucun favori</h2>
-          <p className="text-gray-500 text-center text-sm">
-            Explore les métiers et formations et sauvegarde ceux qui t'intéressent
-          </p>
-        </div>
-      )}
-
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 mt-2">
 
         {/* ── Métiers ── */}
-        {favoriteCareerObjects.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3 px-1">
-              <Briefcase className="w-4 h-4 text-primary-500" />
-              <h2 className="text-base font-bold text-gray-800">Métiers sauvegardés</h2>
-              <span className="ml-auto text-xs text-gray-400 font-medium">{favoriteCareerObjects.length}</span>
+        <section>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <Briefcase className="w-4 h-4 text-primary-500" />
+            <h2 className="text-base font-bold text-gray-800">Métiers sauvegardés</h2>
+            <span className="ml-auto text-xs text-gray-400 font-medium">{favoriteCareerObjects.length}</span>
+          </div>
+
+          {favoriteCareerObjects.length === 0 ? (
+            <div className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm">
+              <Briefcase className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <p className="text-sm text-emerald-700">
+                Pas encore de métiers sauvegardés — explore l'onglet Métiers !
+              </p>
             </div>
+          ) : (
             <div className="space-y-2">
               {favoriteCareerObjects.map(career => (
                 <div key={career.id} className="bg-white rounded-2xl p-4 shadow-sm">
@@ -107,8 +99,8 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
                         Voir
                       </button>
                       <button
-                        onClick={() => onToggleFormation(fid)}
-                        className="w-9 h-9 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors flex-shrink-0"
+                        onClick={() => onToggleFavorite(career.id)}
+                        className="w-9 h-9 bg-blue-50 text-primary-500 rounded-xl flex items-center justify-center hover:bg-blue-100 transition-colors flex-shrink-0"
                         title="Retirer des favoris"
                       >
                         <Bookmark className="w-4 h-4 fill-current" />
@@ -118,24 +110,31 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* ── Formations ── */}
-        {savedFormationIds.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3 px-1">
-              <GraduationCap className="w-4 h-4 text-emerald-500" />
-              <h2 className="text-base font-bold text-gray-800">Formations sauvegardées</h2>
-              <span className="ml-auto text-xs text-gray-400 font-medium">{savedFormationIds.length}</span>
+        <section>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <GraduationCap className="w-4 h-4 text-emerald-500" />
+            <h2 className="text-base font-bold text-gray-800">Formations sauvegardées</h2>
+            <span className="ml-auto text-xs text-gray-400 font-medium">{savedFormationIds.length}</span>
+          </div>
+
+          {savedFormationIds.length === 0 ? (
+            <div className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm">
+              <GraduationCap className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <p className="text-sm text-emerald-700">
+                Pas encore de formations sauvegardées — explore l'onglet Formations !
+              </p>
             </div>
+          ) : (
             <div className="space-y-2">
               {savedFormationIds.map((fid, i) => {
                 const f = savedFormationObjects[i];
                 return (
                   <div key={fid} className="bg-white rounded-2xl p-4 shadow-sm">
                     <div className="flex items-start gap-3">
-                     
                       <div className="flex-1 min-w-0">
                         {f ? (
                           <>
@@ -148,7 +147,7 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
                             {f.domain && (
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {f.domain.split(',').slice(0, 2).map((d: string, j: number) => (
-                                  <span key={j} className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-medium">
+                                  <span key={j} className="text-xs text-gray-400 mt-0.5">
                                     {d.trim()}
                                   </span>
                                 ))}
@@ -162,30 +161,28 @@ export default function Favorites({ userProfile, onCareerClick, onToggleFavorite
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => onToggleFormation(fid)}
-                        className="w-9 h-9 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors flex-shrink-0"
-                        title="Retirer des favoris"
-                      >
-                        <Bookmark className="w-4 h-4 fill-current" />
-                      </button>
+                      <div className="flex gap-2 flex-shrink-0 mt-1">
+                        <button
+                          onClick={() => onFormationClick ? onFormationClick(fid) : undefined}
+                          className="px-3 py-2 bg-primary-500 text-white rounded-xl text-xs font-semibold hover:bg-primary-600 transition-colors"
+                        >
+                          Voir
+                        </button>
+                        <button
+                          onClick={() => onToggleFormation(fid)}
+                          className="w-9 h-9 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors flex-shrink-0"
+                          title="Retirer des favoris"
+                        >
+                          <Bookmark className="w-4 h-4 fill-current" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </section>
-        )}
-
-        {/* Invite formations si aucune */}
-        {favoriteCareerObjects.length > 0 && savedFormationIds.length === 0 && (
-          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-            <GraduationCap className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-            <p className="text-sm text-emerald-700">
-              Pas encore de formations sauvegardées — explore l'onglet Formations !
-            </p>
-          </div>
-        )}
+          )}
+        </section>
 
       </div>
     </div>

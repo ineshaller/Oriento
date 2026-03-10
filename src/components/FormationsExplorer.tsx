@@ -218,7 +218,7 @@ export default function FormationsExplorer({
   const displayedFormations = filteredFormations.slice(0, page * PAGE_SIZE);
 
   const isFavorite = (formationId: string) => {
-    return userProfile.favoriteJobs?.includes(formationId);
+    return userProfile.savedFormations?.includes(formationId);
   };
 
   /* -------------------- LOADING STATE -------------------- */

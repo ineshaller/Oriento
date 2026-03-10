@@ -33,7 +33,6 @@ interface FormationDetailProps {
   onChat: () => void;
 }
 
-/* -------------------- DOMAIN CONFIG -------------------- */
 const domainConfig: Record<string, any> = {
   Droit: GraduationCap,
   "Lettres Langues et Sciences Humaines": BookA,
@@ -65,32 +64,31 @@ function getIconFromDomain(domain: string) {
 
 function domainGradient(domain: string): string {
   const map: Record<string, string> = {
-    "Informatique et Numérique":            "from-blue-500 to-cyan-400",
-    "Ingénierie et Technologie":            "from-blue-600 to-blue-400",
-    "Mathématiques et statistiques":        "from-indigo-500 to-blue-400",
-    "Sciences et Recherche":                "from-teal-500 to-cyan-400",
-    "Commerce et Management":               "from-orange-500 to-amber-400",
-    "Economie et Finance":                  "from-green-600 to-emerald-400",
-    "Marketing et Communication":           "from-violet-500 to-purple-400",
-    "Droit":                                "from-slate-600 to-slate-400",
+    "Informatique et Numérique": "from-blue-500 to-cyan-400",
+    "Ingénierie et Technologie": "from-blue-600 to-blue-400",
+    "Mathématiques et statistiques": "from-indigo-500 to-blue-400",
+    "Sciences et Recherche": "from-teal-500 to-cyan-400",
+    "Commerce et Management": "from-orange-500 to-amber-400",
+    "Economie et Finance": "from-green-600 to-emerald-400",
+    "Marketing et Communication": "from-violet-500 to-purple-400",
+    "Droit": "from-slate-600 to-slate-400",
     "Lettres Langues et Sciences Humaines": "from-rose-500 to-pink-400",
-    "Immobilier":                           "from-stone-500 to-stone-400",
-    "Logistique et Transport":              "from-sky-500 to-sky-400",
-    "Science Politique":                    "from-zinc-600 to-zinc-400",
-    "BTP":                                  "from-stone-600 to-amber-400",
-    "Architecture et Design":               "from-fuchsia-500 to-purple-400",
-    "Art et Culture":                       "from-pink-500 to-rose-400",
-    "Technique et Industrie":               "from-gray-600 to-gray-400",
-    "Tourisme et Hotellerie":               "from-yellow-500 to-amber-400",
-    "Environnement et Agriculture":         "from-lime-600 to-green-400",
-    "Sport":                                "from-emerald-500 to-green-400",
-    "Social et Education":                  "from-sky-500 to-blue-400",
-    "Santé et Esthétique":                  "from-rose-500 to-pink-400",
+    "Immobilier": "from-stone-500 to-stone-400",
+    "Logistique et Transport": "from-sky-500 to-sky-400",
+    "Science Politique": "from-zinc-600 to-zinc-400",
+    "BTP": "from-stone-600 to-amber-400",
+    "Architecture et Design": "from-fuchsia-500 to-purple-400",
+    "Art et Culture": "from-pink-500 to-rose-400",
+    "Technique et Industrie": "from-gray-600 to-gray-400",
+    "Tourisme et Hotellerie": "from-yellow-500 to-amber-400",
+    "Environnement et Agriculture": "from-lime-600 to-green-400",
+    "Sport": "from-emerald-500 to-green-400",
+    "Social et Education": "from-sky-500 to-blue-400",
+    "Santé et Esthétique": "from-rose-500 to-pink-400",
   };
   return map[domain] ?? "from-gray-500 to-gray-400";
 }
 
-/* -------------------- Helper établissement -------------------- */
 function parseEtablissement(etablissement: string) {
   const match = etablissement.match(/^(.*?)\s*\((.*?)\)$/);
   if (match) {
@@ -99,7 +97,6 @@ function parseEtablissement(etablissement: string) {
   return { name: etablissement.trim(), location: "" };
 }
 
-/* -------------------- SUB COMPONENTS -------------------- */
 function InfoBadge({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex-1 bg-white rounded-2xl p-3 shadow-sm flex items-start gap-2 min-w-0">
@@ -126,7 +123,6 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
   );
 }
 
-/* -------------------- COMPONENT -------------------- */
 export default function FormationDetail({
   formationId,
   userProfile,
@@ -136,6 +132,14 @@ export default function FormationDetail({
 }: FormationDetailProps) {
   const [formationsData, setFormationsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState<boolean>(
+    () => userProfile.savedFormations?.includes(formationId) ?? false
+  );
+
+  // Synchronise si userProfile change depuis l'extérieur
+  useEffect(() => {
+    setIsFavorite(userProfile.savedFormations?.includes(formationId) ?? false);
+  }, [userProfile.savedFormations, formationId]);
 
   useEffect(() => {
     fetch("/data/formations_final.json")
@@ -153,6 +157,11 @@ export default function FormationDetail({
       });
   }, []);
 
+  const handleToggleFavorite = () => {
+    setIsFavorite(prev => !prev);
+    onToggleFavorite(formationId);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -166,7 +175,6 @@ export default function FormationDetail({
   }
 
   const formation = formationsData.find(f => f.id === formationId) || formationsData[0];
-  const isFavorite = userProfile.favoriteJobs?.includes(formationId);
 
   const firstDomain = formation.domain
     ? formation.domain.split(",")[0].trim()
@@ -202,7 +210,7 @@ export default function FormationDetail({
             <ArrowLeft className="w-5 h-5 text-gray-800" />
           </button>
           <button
-            onClick={() => onToggleFavorite(formationId)}
+            onClick={handleToggleFavorite}
             className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow"
           >
             {isFavorite
@@ -363,18 +371,9 @@ export default function FormationDetail({
               )}
             </div>
           </Section>
-        )}
-
+        )
+        }
       </div>
-
-      {/* ── Bouton chatbot flottant ── */}
-      <button
-        onClick={onChat}
-        className="fixed bottom-28 right-5 w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-xl flex items-center justify-center z-50"
-        title="Discuter avec le chatbot"
-      >
-        <MessageCircle className="w-6 h-6 text-white" />
-      </button>
     </div>
   );
 }
