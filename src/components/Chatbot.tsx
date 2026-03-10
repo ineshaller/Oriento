@@ -550,13 +550,13 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
     }
 
     /* ===== STUDIES ===== */
-
+    const StudyType = "";
     if (step === "studies") {
 
       if (userMessage === "Licence" || userMessage === "BUT" || userMessage === "BTS" || userMessage === "Prépa" || userMessage === "Ecoles" || userMessage === "Bachelor") {
         setSelectedStudyType(userMessage);
         setStep("study_detail");
-
+        let StudyType = userMessage;
         const studyInfo = getStudyInfo(userMessage);
 
         return {
@@ -597,14 +597,12 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
     /* ===== STUDY DETAIL ===== */
     if (step === "study_detail") {
 
+      // Dans le bloc study_detail, remplacer le bloc formations par :
       if (userMessage.includes("formations")) {
-
         if (selectedStudyType) {
-          window.location.href = `/formations?search=${encodeURIComponent(selectedStudyType)}`;
+          localStorage.setItem("formationFilter", selectedStudyType); // ✅ stocker
         }
-
         onNavigate("formations");
-
         return {
           id: Date.now().toString(),
           text: "Je t'affiche les formations correspondantes 👇",
