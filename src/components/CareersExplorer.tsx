@@ -23,16 +23,30 @@ interface CareersExplorerProps {
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-// Importez directement le JSON généré depuis le CSV ONISEP :
-// import careersData from '../data/careers_onisep.json';
-//
-// Ou chargez-le dynamiquement (voir hook useCareerData ci-dessous).
-// Pour l'exemple, on utilise un import statique :
 
 import careersData from '../data/careers_onisep.json';
-const careers: Career[] = careersData as Career[];
+
+const rawCareers: Career[] = careersData as Career[];
+
+// Dédupliquer par title (au cas où des ids différents auraient le même titre)
+const seen = new Set<string>();
+const careers: Career[] = rawCareers.filter(c => {
+  const key = c.title.toLowerCase().trim();
+  if (seen.has(key)) return false;
+  seen.add(key);
+  return true;
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function normalize(str: string): string {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
+    .toLowerCase()
+    .trim();
+}
 
 /** Retourne une couleur Tailwind selon le secteur */
 function sectorColor(sector: string): string {
@@ -67,24 +81,24 @@ const ALL_SECTORS = [
   'Administration',
   'Agriculture',
   'Agroalimentaire',
-  'Bois & Matériaux',
   'Bâtiment',
+  'Bois & Matériaux',
   'Chimie & Biologie',
   'Commerce & Gestion',
   'Communication & Médias',
+  'Électricité & Énergie',
   'Enseignement',
   'Hôtellerie & Tourisme',
   'Imprimerie & Graphisme',
   'Informatique & Numérique',
   'Mécanique',
   'Métallurgie',
-  'Production industrielle',
   'Pêche & Mer',
+  'Production industrielle',
   'Santé & Social',
   'Sécurité & Défense',
   'Textile & Mode',
   'Transport & Logistique',
-  'Électricité & Énergie',
 ];
 
 const PAGE_SIZE = 30;
@@ -96,19 +110,21 @@ export default function CareersExplorer({
   onCareerClick,
   onToggleFavorite,
 }: CareersExplorerProps) {
-  const [searchTerm, setSearchTerm]       = useState('');
+  const [searchTerm, setSearchTerm]         = useState('');
   const [selectedSector, setSelectedSector] = useState('Tous');
-  const [page, setPage]                   = useState(1);
+  const [page, setPage]                     = useState(1);
 
   const filtered = useMemo(() => {
-    const q = searchTerm.toLowerCase();
+    const words = normalize(searchTerm).split(/\s+/).filter(Boolean);
     return careers.filter(c => {
       const matchesSearch =
-        !q ||
-        c.title.toLowerCase().includes(q) ||
-        c.sector.toLowerCase().includes(q) ||
-        c.rome_labels.some(r => r.toLowerCase().includes(q)) ||
-        c.domaines.some(d => d.toLowerCase().includes(q));
+        words.length === 0 ||
+        words.every(w =>
+          normalize(c.title).includes(w) ||
+          normalize(c.sector).includes(w) ||
+          c.rome_labels.some(r => normalize(r).includes(w)) ||
+          c.domaines.some(d => normalize(d).includes(w))
+        );
       const matchesSector = selectedSector === 'Tous' || c.sector === selectedSector;
       return matchesSearch && matchesSector;
     });
@@ -119,7 +135,6 @@ export default function CareersExplorer({
 
   const isFavorite = (id: string) => userProfile.favoriteJobs?.includes(id) ?? false;
 
-  // Reset page on filter change
   const handleSearch = (v: string) => { setSearchTerm(v); setPage(1); };
   const handleSector = (s: string) => { setSelectedSector(s); setPage(1); };
 

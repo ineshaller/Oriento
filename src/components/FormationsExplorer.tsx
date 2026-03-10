@@ -20,6 +20,15 @@ import {
 } from "lucide-react";
 import type { UserProfile } from "../App";
 
+function normalize(str: string): string {
+  return str
+    .normalize("NFD")                    // décompose les accents
+    .replace(/[\u0300-\u036f]/g, "")     // supprime les diacritiques
+    .replace(/[^a-zA-Z0-9\s]/g, " ")    // remplace les caractères spéciaux par un espace
+    .toLowerCase()
+    .trim();
+}
+
 interface FormationsExplorerProps {
   userProfile: UserProfile;
   onFormationClick: (formationId: string) => void;
@@ -60,37 +69,37 @@ function getIconFromDomain(domain: string) {
 /* -------------------- RIASEC CONFIG -------------------- */
 
 const RIASEC_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  R: { label: "Réaliste",      color: "#9a3412", bg: "#ffedd5" },
+  R: { label: "Réaliste", color: "#9a3412", bg: "#ffedd5" },
   I: { label: "Investigateur", color: "#1d4ed8", bg: "#dbeafe" },
-  A: { label: "Artistique",    color: "#6b21a8", bg: "#f3e8ff" },
-  S: { label: "Social",        color: "#15803d", bg: "#dcfce7" },
-  E: { label: "Entrepreneur",  color: "#b91c1c", bg: "#fee2e2" },
+  A: { label: "Artistique", color: "#6b21a8", bg: "#f3e8ff" },
+  S: { label: "Social", color: "#15803d", bg: "#dcfce7" },
+  E: { label: "Entrepreneur", color: "#b91c1c", bg: "#fee2e2" },
   C: { label: "Conventionnel", color: "#374151", bg: "#e5e7eb" },
 };
 
 const domainToRiasec: Record<string, string[]> = {
-  "Droit":                                ["E", "C"],
+  "Droit": ["E", "C"],
   "Lettres Langues et Sciences Humaines": ["A", "S"],
-  "Informatique et Numérique":            ["I", "R"],
-  "Ingénierie et Technologie":            ["R", "I"],
-  "Mathématiques et statistiques":        ["I", "C"],
-  "Sciences et Recherche":                ["I", "R"],
-  "Commerce et Management":               ["E", "C"],
-  "Economie et Finance":                  ["C", "E"],
-  "Marketing et Communication":           ["E", "A"],
-  "Immobilier":                           ["E", "C"],
-  "Logistique et Transport":              ["R", "C"],
-  "Science Politique":                    ["E", "S"],
-  "BTP":                                  ["R", "I"],
-  "Architecture et Design":               ["A", "R"],
-  "Art et Culture":                       ["A"],
-  "Technique et Industrie":               ["R", "I"],
-  "Tourisme et Hotellerie":               ["S", "E"],
-  "Environnement et Agriculture":         ["R", "I"],
-  "Sport":                                ["R", "S"],
-  "Social et Education":                  ["S"],
-  "Santé et Esthétique":                  ["S", "I"],
-  "Autre":                                [],
+  "Informatique et Numérique": ["I", "R"],
+  "Ingénierie et Technologie": ["R", "I"],
+  "Mathématiques et statistiques": ["I", "C"],
+  "Sciences et Recherche": ["I", "R"],
+  "Commerce et Management": ["E", "C"],
+  "Economie et Finance": ["C", "E"],
+  "Marketing et Communication": ["E", "A"],
+  "Immobilier": ["E", "C"],
+  "Logistique et Transport": ["R", "C"],
+  "Science Politique": ["E", "S"],
+  "BTP": ["R", "I"],
+  "Architecture et Design": ["A", "R"],
+  "Art et Culture": ["A"],
+  "Technique et Industrie": ["R", "I"],
+  "Tourisme et Hotellerie": ["S", "E"],
+  "Environnement et Agriculture": ["R", "I"],
+  "Sport": ["R", "S"],
+  "Social et Education": ["S"],
+  "Santé et Esthétique": ["S", "I"],
+  "Autre": [],
 };
 
 function getRiasecFromDomains(domainStr: string): string[] {
@@ -160,7 +169,7 @@ export default function FormationsExplorer({
               : ["Autre"]
           )
         )
-      )
+      ).sort((a, b) => a.localeCompare(b, "fr"))
     ];
   }, [formationsData]);
 
@@ -181,9 +190,13 @@ export default function FormationsExplorer({
           ? f.domain.split(",").map((d: string) => d.trim())
           : ["Autre"];
 
+        const q = normalize(searchTerm);
+        const words = q.split(/\s+/).filter(Boolean);
+        const titleNorm = normalize(f.title);
+        const etabNorm = normalize(f.etablissement);
         const matchesSearch =
-          f.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          f.etablissement.toLowerCase().includes(searchTerm.toLowerCase());
+          words.length === 0 ||
+          words.every(w => titleNorm.includes(w) || etabNorm.includes(w));
 
         const matchesSector =
           selectedSector === "Tous" || domains.includes(selectedSector);
@@ -252,11 +265,10 @@ export default function FormationsExplorer({
                 setShowMatchOnly(prev => !prev);
                 setPage(1);
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-colors ${
-                showMatchOnly
-                  ? "bg-yellow-400 text-yellow-900"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-colors ${showMatchOnly
+                ? "bg-yellow-400 text-yellow-900"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
             >
               <Sparkles className="w-4 h-4" />
               {showMatchOnly
@@ -293,11 +305,10 @@ export default function FormationsExplorer({
                 setSelectedSector(sector);
                 setPage(1);
               }}
-              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
-                selectedSector === sector
-                  ? "bg-primary-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${selectedSector === sector
+                ? "bg-primary-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
             >
               {sector}
             </button>
@@ -322,9 +333,8 @@ export default function FormationsExplorer({
           return (
             <div
               key={f.id}
-              className={`bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${
-                isMatch ? "ring-2 ring-yellow-300" : ""
-              }`}
+              className={`bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${isMatch ? "ring-2 ring-yellow-300" : ""
+                }`}
             >
               <div className="flex items-start gap-4">
 
@@ -356,13 +366,13 @@ export default function FormationsExplorer({
                   <div className="text-xs text-gray-500 mb-2 flex flex-wrap gap-1">
                     {f.domain
                       ? f.domain.split(",").map((d: string, i: number) => (
-                          <span
-                            key={i}
-                            className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                          >
-                            {d.trim()}
-                          </span>
-                        ))
+                        <span
+                          key={i}
+                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                        >
+                          {d.trim()}
+                        </span>
+                      ))
                       : (
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                           Autre
@@ -381,9 +391,8 @@ export default function FormationsExplorer({
                           <span
                             key={code}
                             style={{ backgroundColor: r.bg, color: r.color }}
-                            className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                              isUserCode ? "ring-2 ring-offset-1 ring-yellow-400" : ""
-                            }`}
+                            className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isUserCode ? "ring-2 ring-offset-1 ring-yellow-400" : ""
+                              }`}
                           >
                             {code} · {r.label}
                           </span>
@@ -402,11 +411,10 @@ export default function FormationsExplorer({
 
                     <button
                       onClick={() => onToggleFavorite(f.id)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                        favorite
-                          ? "bg-primary-100 text-primary-600"
-                          : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                      }`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${favorite
+                        ? "bg-primary-100 text-primary-600"
+                        : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                        }`}
                     >
                       {favorite ? (
                         <Bookmark className="w-5 h-5 fill-current" />
