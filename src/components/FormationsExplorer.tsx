@@ -141,6 +141,15 @@ export default function FormationsExplorer({
   /* -------------------- FETCH DATA -------------------- */
 
   useEffect(() => {
+    const filter = localStorage.getItem("formationFilter");
+    if (filter) {
+      setSearchTerm(filter);
+      setPage(1);
+      localStorage.removeItem("formationFilter"); // ✅ consommer le filtre
+    }
+  }, []);
+
+  useEffect(() => {
     fetch("/data/formations_final.json")
       .then(res => {
         if (!res.ok) throw new Error("Erreur chargement formations");
