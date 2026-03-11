@@ -15,6 +15,7 @@ import FormationDetail from "./components/FormationDetail";
 import Favorites from "./components/Favorites";
 import Profile from "./components/Profile";
 import BottomNav from "./components/BottomNav";
+import AuthTest from "./components/AuthTest";
 
 export type Screen =
   | "splash"
@@ -248,6 +249,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* <AuthTest /> */}
       <div className="max-w-md mx-auto bg-white min-h-screen relative">
         {renderScreen()}
         {showBottomNav && <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />}
@@ -255,5 +257,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
