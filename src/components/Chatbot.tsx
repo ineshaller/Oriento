@@ -1,6 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { Send, Sparkles } from 'lucide-react';
 import type { UserProfile, Screen } from '../App';
+
+// En haut de Chatbot.tsx, ajouter l'import
+import careersData from '../data/careers_enriched.json';
+import type { Career } from './CareersExplorer';
+
+const careers: Career[] = careersData as Career[];
 
 interface ChatbotProps {
   userProfile: UserProfile;
@@ -15,6 +21,32 @@ interface Message {
 }
 
 /* ================== DOMAINE LOGIQUE ================== */
+
+const defSpecilties: Record<string, string> = {
+  "Maths": "Spécialité centrée sur le raisonnement logique, les calculs, les fonctions et les probabilités. Utile pour les études scientifiques, l’ingénierie, l’économie ou la data.",
+  
+  "Physique-Chimie": "Étude des lois de la physique et de la chimie : énergie, mouvement, réactions chimiques. Recommandée pour les études scientifiques, médicales ou d’ingénierie.",
+  
+  "SVT": "Sciences de la Vie et de la Terre : biologie, corps humain, environnement et géologie. Utile pour les études en médecine, biologie, environnement ou recherche.",
+  
+  "SES": "Sciences Économiques et Sociales : économie, société, fonctionnement des marchés et inégalités. Adaptée pour commerce, économie, gestion ou sciences politiques.",
+  
+  "HGGSP": "Histoire-Géographie, Géopolitique et Sciences Politiques : analyse du monde contemporain, des relations internationales et des enjeux politiques.",
+  
+  "LLCA": "Étude de la culture, l'histoire, la géographie, la philosophie, la littérature et la langue grecque et/ou romaine.",
+  
+  "LLCE": "Étude approfondie d’une langue étrangère (anglais, espagnol, allemand, etc.) et de la culture associée.",
+  
+  "HLP": "Analyse de grands textes littéraires et philosophiques pour réfléchir aux idées, aux valeurs et à la pensée humaine.",
+  
+  "NSI": "Numérique et Sciences Informatiques : programmation, algorithmes, réseaux et fonctionnement des systèmes informatiques.",
+  
+  "SI": "Sciences de l’Ingénieur : conception et fonctionnement des systèmes technologiques et industriels.",
+  
+  "Arts": "Exploration artistique selon la spécialité choisie (cinéma, musique, arts plastiques, théâtre…).",
+  
+  "Sports": "Éducation Physique, Pratiques et Culture Sportive : étude du sport, de la performance et des activités physiques."
+};
 
 const specialtiesMap: Record<string, string[]> = {
   Maths: ["Mathématiques et statistiques"],
@@ -81,32 +113,178 @@ const getSpecialtiesFromRiasec = (riasec: string[]) => {
   return map[code] || ["Maths", "SES"];
 };
 
-const compareSpecialties = (spec1: string, spec2: string) => {
 
-  const info: Record<string, string> = {
-    "Maths": "Utile pour ingénierie, économie, data...",
-    "SES": "Utile pour commerce, gestion, droit...",
-    "NSI": "Utile pour informatique, cybersécurité...",
-    "SVT": "Utile pour médecine, biologie..."
+
+const compareSpecialties = (spec1: string, spec2: string, spec3: string, userProfile: UserProfile) => {
+
+  const specToSectors: Record<string, string[]> = {
+    "Maths":           ["Informatique & Numérique", "Commerce & Gestion", "Bâtiment", "Transport & Logistique", "Chimie & Biologie"],
+    "SES":             ["Commerce & Gestion", "Administration", "Communication & Médias", "Enseignement"],
+    "NSI":             ["Informatique & Numérique"],
+    "SVT":             ["Santé & Social", "Agriculture", "Chimie & Biologie"],
+    "Physique-Chimie": ["Bâtiment", "Chimie & Biologie", "Transport & Logistique", "Santé & Social"],
+    "HGGSP":           ["Administration", "Enseignement", "Sécurité & Défense"],
+    "LLCE":            ["Communication & Médias", "Hôtellerie & Tourisme", "Enseignement"],
+    "LLCA":            ["Communication & Médias", "Enseignement"],
+    "HLP":             ["Enseignement", "Communication & Médias"],
+    "Arts":            ["Communication & Médias"],
+    "SI":              ["Bâtiment", "Transport & Logistique", "Informatique & Numérique"],
+    "Sports":          ["Santé & Social", "Enseignement", "Sécurité & Défense"],
   };
 
-  return `
-${spec1} :
-• ${info[spec1] || "Polyvalente"}
+  const riasecToSectors: Record<string, string[]> = {
+    R: ["Bâtiment", "Transport & Logistique", "Agriculture"],
+    I: ["Informatique & Numérique", "Chimie & Biologie", "Santé & Social"],
+    A: ["Communication & Médias", "Hôtellerie & Tourisme"],
+    S: ["Enseignement", "Santé & Social"],
+    E: ["Commerce & Gestion", "Administration"],
+    C: ["Administration", "Commerce & Gestion"],
+  };
 
-${spec2} :
-• ${info[spec2] || "Polyvalente"}
-`;
+  const specialtyToInterests: Record<string, string[]> = {
+    "Maths":           ["Technologies", "Sciences"],
+    "Physique-Chimie": ["Sciences", "Travaux manuels"],
+    "SVT":             ["Sciences", "Santé", "Sport"],
+    "SES":             ["Relationnel"],
+    "HGGSP":           ["Relationnel", "Voyages"],
+    "HLP":             ["Littérature", "Art", "Musique", "Relationnel"],
+    "LLCE":            ["Littérature", "Voyages"],
+    "LLCA":            ["Littérature", "Art", "Musique"],
+    "NSI":             ["Technologies"],
+    "SI":              ["Technologies", "Travaux manuels"],
+    "Arts":            ["Art", "Musique", "Photo/Vidéo"],
+    "Sports":          ["Sport", "Santé"],
+  };
+
+  const interestLabels: Record<string, string> = {
+    "sport":      "Sport",
+    "health":     "Santé",
+    "literature": "Littérature",
+    "tech":       "Technologies",
+    "science":    "Sciences",
+    "art":        "Art",
+    "music":      "Musique",
+    "travel":     "Voyages",
+    "social":     "Relationnel",
+    "photo":      "Photo/Vidéo",
+    "manual":     "Travaux manuels",
+  };
+
+  const firstFavoriteCareer = careers.find(c => c.id === userProfile.favoriteJobs?.[0]);
+  const sector = firstFavoriteCareer?.sector;
+
+  const riasecCode = userProfile.riasecProfile?.[0];
+  const fallbackSectors = riasecCode ? riasecToSectors[riasecCode] : null;
+
+  const userInterestsNormalized = userProfile.interests?.map(i => interestLabels[i] ?? i) ?? [];
+
+  const checkSpec = (spec: string): string => {
+    const sectors = specToSectors[spec];
+    if (!sectors) return `${spec} : spécialité non reconnue`;
+
+    // CAS 1 — projet défini
+    if (sector) {
+      const isCoherent = sectors.includes(sector);
+      return isCoherent
+        ? `✅ ${spec} : cohérente avec ton projet (${sector})`
+        : `⚠️ ${spec} : peu alignée avec ton projet (${sector}), plus utile pour ${sectors.slice(0, 2).join(" ou ")}`;
+    }
+
+    // CAS 2 — RIASEC disponible
+    if (fallbackSectors) {
+      const matchingSectors = sectors.filter(s => fallbackSectors.includes(s));
+      return matchingSectors.length > 0
+        ? `✅ ${spec} : cohérente avec ton profil RIASEC (${matchingSectors.join(", ")})`
+        : `⚠️ ${spec} : peu alignée avec ton profil RIASEC, plus utile pour ${sectors.slice(0, 2).join(", ")}`;
+    }
+
+    // CAS 3 — centres d'intérêt disponibles
+    if (userInterestsNormalized.length > 0) {
+      const matchingInterests = (specialtyToInterests[spec] ?? [])
+        .filter(i => userInterestsNormalized.includes(i));
+      return matchingInterests.length > 0
+        ? `✅ ${spec} : cohérente avec tes centres d'intérêt (${matchingInterests.join(", ")})`
+        : `⚠️ ${spec} : peu alignée avec tes centres d'intérêt, plus utile pour ${(specialtyToInterests[spec] ?? []).slice(0, 2).join(", ")}`;
+    }
+
+    // CAS 4 — aucune donnée
+    return `❌ ${spec} : impossible de te conseiller sans projet, profil RIASEC ou centres d'intérêt définis.`;
+  };
+
+  const specs = [spec1, spec2, spec3].filter(Boolean);
+  const results = specs.map(checkSpec).join("\n\n");
+
+  // Conclusion — trouver la spécialité à abandonner selon le cas
+  const scores = specs.map(spec => {
+    let score = 0;
+
+    if (sector) {
+      score = (specToSectors[spec] ?? []).includes(sector) ? 1 : 0;
+    } else if (fallbackSectors) {
+      score = (specToSectors[spec] ?? []).filter(s => fallbackSectors.includes(s)).length;
+    } else if (userInterestsNormalized.length > 0) {
+      score = (specialtyToInterests[spec] ?? []).filter(i => userInterestsNormalized.includes(i)).length;
+    }
+
+    return { spec, score };
+  });
+
+  const minScore = Math.min(...scores.map(s => s.score));
+  const toAbandon = scores.filter(s => s.score === minScore);
+
+  const conclusion = toAbandon.length === 1
+    ? `\n\n💡 Notre recommandation : abandonne ${toAbandon[0].spec} en Terminale, c'est la moins alignée avec ton profil.`
+    : `\n\n💡 Les spécialités ${toAbandon.map(s => s.spec).join(" et ")} sont aussi pertinentes l'une que l'autre, le choix dépend davantage de ton projet.`;
+
+  return results + conclusion;
+};
+
+const sectorToSpecialties: Record<string, string[]> = {
+  "Informatique & Numérique":  ["NSI", "Maths"],
+  "Santé & Social":            ["SVT", "Physique-Chimie", "SES"],
+  "Commerce & Gestion":        ["SES", "Maths"],
+  "Communication & Médias":    ["Arts", "LLCE"],
+  "Enseignement":              ["HLP", "SES"],
+  "Bâtiment":                  ["Maths", "Physique-Chimie", "SI"],
+  "Transport & Logistique":    ["Maths", "Physique-Chimie", "SI"],
+  "Hôtellerie & Tourisme":     ["LLCE", "SES"],
+  "Agriculture":               ["SVT", "Physique-Chimie"],
+  "Chimie & Biologie":         ["SVT", "Physique-Chimie", "Maths"],
+  "Administration":            ["SES", "HGGSP"],
+  "Sécurité & Défense":        ["EPS", "Maths"],
+};
+
+const checkCoherenceWithSector = (sector: string, userSpecialties: string[]): string => {
+  const recommendedSpecs = sectorToSpecialties[sector];
+
+  if (!recommendedSpecs) {
+    return `Je n'ai pas de données pour le secteur "${sector}".`;
+  }
+
+  const matching = userSpecialties.filter(s => recommendedSpecs.includes(s));
+  const missing  = recommendedSpecs.filter(s => !userSpecialties.includes(s));
+
+  if (matching.length === 0) {
+    return `Tes spécialités ne semblent pas alignées avec le secteur "${sector}". Les spécialités recommandées sont : ${recommendedSpecs.join(", ")}.`;
+  }
+
+  if (missing.length === 0) {
+    return `✅ Tes spécialités sont parfaitement cohérentes avec le secteur "${sector}" !`;
+  }
+
+  return `👍 Tes spécialités ${matching.join(", ")} sont cohérentes avec "${sector}". Tu pourrais aussi envisager : ${missing.join(", ")}.`;
 };
 
 const checkSpecialtiesCoherence = (profile: UserProfile) => {
-
+  console.log("favoriteJobs:", profile.favoriteJobs);
+  const firstFavoriteId = profile.favoriteJobs?.[0]; // Il faut changer favoriteJobs par le vrai projet de l'utilisateur
+  const firstFavoriteCareer = careers.find(c => c.id === firstFavoriteId);
   if (!profile.specialties?.length) {
     return "Je n'ai pas tes spécialités enregistrées.";
   }
 
-  if (profile.favoriteJobs) { // Il faut changer favoriteJobs par le vrai projet de l'utilisateur
-    return `Tes spécialités semblent cohérentes avec ton projet "${profile.favoriteJobs[0]}".`;
+  if (firstFavoriteCareer?.sector) { 
+    return checkCoherenceWithSector(firstFavoriteCareer.sector, profile.specialties);
   }
 
   return "Tes spécialités sont cohérentes, mais définir un projet précis permettrait d'affiner.";
@@ -284,7 +462,9 @@ type ChatStep =
 | "domains_result"
 | "specialties"
 | "studies"
-| "study_detail";
+| "DefSpec"
+| "study_detail"
+| "send_to_riasec";
 
 export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
 
@@ -407,24 +587,27 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
     }
     /* ===== SPECIALITÉS ===== */
     if (step === "specialties") {
-
       if (userMessage === "🔙 Retour") {
         resetConversation();
         return { id: Date.now().toString(), text: "", sender: "bot" };
       }
-
-      /* 📌 CAS 1 — Correspondent à mon projet */
-
-      if (userMessage.includes("correspondent")) {
+      
+      if (userMessage.includes("spécialités")) {
 
         const project = userProfile.favoriteJobs; // Il faut changer favoriteJobs par le vrai projet de l'utilisateur
-        console.log("Projet du profil :", project);
-        if (project && project.length > 0) {
+        // Exemple : récupérer le secteur du premier métier favori
+        const firstFavoriteId = project?.[0];
+        const firstFavoriteCareer = careers.find(c => c.id === firstFavoriteId);
+        const sector = firstFavoriteCareer?.sector; // ex: "Informatique & Numérique"
+        console.log("Projet du profil :", firstFavoriteCareer?.title, "Secteur :", sector);
+        /* 📌 CAS 1 — Correspondent à mon projet */
+        if (firstFavoriteCareer && sector && project) {
+          setStep("DefSpec");
           const recommendedSpecs = getRecommendedSpecialtiesForProject(project[0]);
 
           return {
             id: Date.now().toString(),
-            text: `Pour ton projet "${project}", voici les spécialités recommandées 👇`,
+            text: `Pour ton projet "${firstFavoriteCareer?.title}", voici les spécialités recommandées 👇`,
             sender: "bot",
             suggestions: recommendedSpecs.concat(["🔙 Retour"])
           };
@@ -433,7 +616,7 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
         /* CAS 2 — Pas de projet → RIASEC */
 
         if (userProfile.riasecProfile?.length) {
-
+          setStep("DefSpec");
           const specsFromRiasec = getSpecialtiesFromRiasec(userProfile.riasecProfile);
 
           return {
@@ -444,12 +627,15 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
           };
         }
 
-        return {
-          id: Date.now().toString(),
-          text: "Je te conseille de faire le test RIASEC pour affiner ton choix 👇",
-          sender: "bot",
-          suggestions: ["🧠 Faire le test RIASEC", "🔙 Retour"]
-        };
+        else if (!userProfile.riasecProfile?.length) {
+          setStep("send_to_riasec");
+          return {
+            id: Date.now().toString(),
+            text: "Je te conseille de faire le test RIASEC pour affiner ton choix 👇",
+            sender: "bot",
+            suggestions: ["🧠 Faire le test RIASEC", "🔙 Retour"]
+          };
+        }
       }
 
       /* ❌ CAS 3 — Laquelle abandonner */
@@ -468,7 +654,7 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
 
         return {
           id: Date.now().toString(),
-          text: `Comparons tes spécialités 👇\n\n${compareSpecialties(specs[0], specs[1])}`,
+          text: `Comparons tes spécialités 👇\n\n${compareSpecialties(specs[0], specs[1], specs[2],userProfile)}`,
           sender: "bot",
           suggestions: ["🔙 Retour"]
         };
@@ -477,7 +663,7 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
       /* 🔄 CAS 4 — Cohérence */
 
       if (userMessage.includes("cohérentes")) {
-
+        
         const result = checkSpecialtiesCoherence(userProfile);
 
         return {
@@ -486,6 +672,37 @@ export default function Chatbot({ userProfile, onNavigate }: ChatbotProps) {
           sender: "bot",
           suggestions: ["🔙 Retour"]
         };
+      }
+    }
+    /* ===== DEF SPEC ===== */
+
+    if (step === "DefSpec") {
+      if (userMessage === "🔙 Retour") {
+        resetConversation();
+        return { id: Date.now().toString(), text: "", sender: "bot" };
+      }
+      else if (defSpecilties[userMessage]) {
+        return {
+          id: Date.now().toString(),
+          text: `${userMessage} : ${defSpecilties[userMessage]}`,
+          sender: "bot",
+          suggestions: ["🔙 Retour"]
+        };
+      }
+    }
+    /* ===== RIASEC RESULT ACTIONS ===== */
+    if (step === "send_to_riasec") {
+      if (userMessage.includes("Faire le test RIASEC")) {
+        onNavigate("riasec-test");
+        return {
+          id: Date.now().toString(),
+          text: "Je t'emmène vers le test RIASEC 👇",
+          sender: "bot"
+        };
+      }
+      if (userMessage === "🔙 Retour") {
+        resetConversation();
+        return { id: Date.now().toString(), text: "", sender: "bot" };
       }
     }
     /* ===== DOMAIN RESULT ACTIONS ===== */
