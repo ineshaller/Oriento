@@ -28,15 +28,15 @@ router.get('/', authMiddleware, async (req, res) => {
 
     res.json({
       profile: {
-      age: user.age,
-      grade: user.grade,
-      specialties: user.specialties,
-      interests: user.interests,
-      riasecProfile: user.riasecProfile,
-      riasecScores: user.riasecScores ? Object.fromEntries(user.riasecScores) : undefined,
-      riasecPrimaryCount: user.riasecPrimaryCount,
-      favoriteJobs: user.favoriteJobs,
-      savedFormations: user.savedFormations,
+        age:                user.age,
+        grade:              user.grade,
+        specialties:        user.specialties,
+        interests:          user.interests,
+        riasecProfile:      user.riasecProfile,
+        riasecScores:       user.riasecScores ? Object.fromEntries(user.riasecScores) : undefined,
+        riasecPrimaryCount: user.riasecPrimaryCount,
+        favoriteJobs:       user.favoriteJobs,
+        savedFormations:    user.savedFormations,
       }
     });
   } catch (err) {
@@ -69,7 +69,7 @@ router.put('/', authMiddleware, async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.userId,
       { $set: updates },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     res.json({ message: 'Profil sauvegardé', profile: updates });
