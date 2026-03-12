@@ -2,6 +2,7 @@
 import { useState } from "react";
 import SplashScreen from "./components/SplashScreen";
 import Onboarding from "./components/Onboarding";
+import AuthScreen from "./components/AuthScreen";
 import ProfileCreation from "./components/ProfileCreation";
 import TestProposal from "./components/TestProposal";
 import RiasecTest from "./components/RiasecTest";
@@ -15,11 +16,11 @@ import FormationDetail from "./components/FormationDetail";
 import Favorites from "./components/Favorites";
 import Profile from "./components/Profile";
 import BottomNav from "./components/BottomNav";
-import AuthTest from "./components/AuthTest";
 
 export type Screen =
   | "splash"
   | "onboarding"
+  | "auth"
   | "profile-creation"
   | "profile-creation-edit"
   | "test-proposal"
@@ -35,6 +36,8 @@ export type Screen =
   | "profile";
 
 export interface UserProfile {
+  email?: string;
+  token?: string;
   age?: number;
   grade?: string;
   specialties?: string[];
@@ -55,6 +58,22 @@ function computePrimaryCount(scores: { [key: string]: number }, orderedCodes: st
     else break;
   }
   return Math.max(1, count);
+}
+
+// ── Helper : sauvegarde n'importe quels champs en BDD ──────────────────────
+async function saveProfileToDB(token: string, data: Partial<UserProfile>) {
+  try {
+    await fetch('/api/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    console.error('Sauvegarde BDD échouée');
+  }
 }
 
 function App() {
@@ -83,26 +102,43 @@ function App() {
     setCurrentScreen("formation-detail");
   };
 
+  // ── Favoris métiers — sauvegarde aussi en BDD ────────────────────────────
   const toggleFavoriteJob = (jobId: string) => {
     setUserProfile((prev) => {
       const favoriteJobs = prev.favoriteJobs || [];
       const isFavorite = favoriteJobs.includes(jobId);
-      return {
-        ...prev,
-        favoriteJobs: isFavorite ? favoriteJobs.filter((id) => id !== jobId) : [...favoriteJobs, jobId],
-      };
+      const updated = isFavorite
+        ? favoriteJobs.filter((id) => id !== jobId)
+        : [...favoriteJobs, jobId];
+      if (prev.token) saveProfileToDB(prev.token, { favoriteJobs: updated });
+      return { ...prev, favoriteJobs: updated };
     });
   };
 
+  // ── Favoris formations — sauvegarde aussi en BDD ─────────────────────────
   const toggleSavedFormation = (formationId: string) => {
     setUserProfile((prev) => {
       const savedFormations = prev.savedFormations || [];
       const isSaved = savedFormations.includes(formationId);
-      return {
-        ...prev,
-        savedFormations: isSaved ? savedFormations.filter((id) => id !== formationId) : [...savedFormations, formationId],
-      };
+      const updated = isSaved
+        ? savedFormations.filter((id) => id !== formationId)
+        : [...savedFormations, formationId];
+      if (prev.token) saveProfileToDB(prev.token, { savedFormations: updated });
+      return { ...prev, savedFormations: updated };
     });
+  };
+
+  // ── Déconnexion ──────────────────────────────────────────────────────────
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUserProfile({
+      favoriteJobs: [],
+      savedFormations: [],
+      riasecProfile: [],
+      riasecScores: undefined,
+      riasecPrimaryCount: 1,
+    });
+    setCurrentScreen("auth");
   };
 
   const renderScreen = () => {
@@ -111,7 +147,54 @@ function App() {
         return <SplashScreen onStart={() => setCurrentScreen("onboarding")} />;
 
       case "onboarding":
-        return <Onboarding onComplete={() => setCurrentScreen("profile-creation")} />;
+        return <Onboarding onComplete={() => setCurrentScreen("auth")} />;
+
+      // ── Auth : récupère le profil existant si reconnexion ─────────────────
+      case "auth":
+        return (
+          <AuthScreen
+            onAuthComplete={async ({ email, token, isNewUser }) => {
+              if (isNewUser) {
+                // Nouvel utilisateur → remplir le profil
+                updateProfile({ email, token });
+                setCurrentScreen("profile-creation");
+              } else {
+                // Reconnexion → charger tout le profil depuis la BDD
+                try {
+                  const res = await fetch('/api/profile', {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  if (res.ok) {
+                    const data = await res.json();
+                    console.log('📦 Profil reçu de la BDD :', data);
+                    const p = data.profile;
+                    updateProfile({
+                      email,
+                      token,
+                      age:                p.age,
+                      grade:              p.grade,
+                      specialties:        p.specialties        || [],
+                      interests:          p.interests          || [],
+                      riasecProfile:      p.riasecProfile      || [],
+                      riasecScores:       p.riasecScores,
+                      riasecPrimaryCount: p.riasecPrimaryCount || 1,
+                      favoriteJobs:       p.favoriteJobs       || [],
+                      savedFormations:    p.savedFormations    || [],
+                    });
+                    // Reconnexion → toujours au dashboard
+                    setCurrentScreen("dashboard");
+                  } else {
+                    updateProfile({ email, token });
+                    setCurrentScreen("profile-creation");
+                  }
+                } catch {
+                  updateProfile({ email, token });
+                  setCurrentScreen("profile-creation");
+                }
+              }
+            }}
+          />
+        );
 
       case "profile-creation":
         return (
@@ -148,11 +231,14 @@ function App() {
           <RiasecTest
             onComplete={(results, scores) => {
               const primaryCount = scores ? computePrimaryCount(scores, results) : 1;
-              updateProfile({
+              const riasecData = {
                 riasecProfile: results,
                 riasecScores: scores,
                 riasecPrimaryCount: primaryCount,
-              });
+              };
+              updateProfile(riasecData);
+              // Sauvegarde les résultats RIASEC en BDD
+              if (userProfile.token) saveProfileToDB(userProfile.token, riasecData);
               setCurrentScreen("test-results");
             }}
           />
@@ -232,7 +318,13 @@ function App() {
         );
 
       case "profile":
-        return <Profile userProfile={userProfile} onEdit={() => setCurrentScreen("profile-creation-edit")} />;
+        return (
+          <Profile
+            userProfile={userProfile}
+            onEdit={() => setCurrentScreen("profile-creation-edit")}
+            onLogout={handleLogout}
+          />
+        );
 
       default:
         return (
@@ -249,7 +341,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <AuthTest /> */}
       <div className="max-w-md mx-auto bg-white min-h-screen relative">
         {renderScreen()}
         {showBottomNav && <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />}
@@ -257,4 +348,5 @@ function App() {
     </div>
   );
 }
+
 export default App;

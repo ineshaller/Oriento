@@ -1,9 +1,10 @@
-import { User, GraduationCap, Heart, Edit, Sparkles, Award } from 'lucide-react';
+import { User, GraduationCap, Heart, Edit, Sparkles, Award, LogOut } from 'lucide-react';
 import type { UserProfile } from '../App';
 
 interface ProfileProps {
   userProfile: UserProfile;
   onEdit: () => void;
+  onLogout: () => void;
 }
 
 const interestLabels: { [key: string]: string } = {
@@ -29,7 +30,7 @@ const riasecNames: { [key: string]: string } = {
   C: 'Conventionnel'
 };
 
-export default function Profile({ userProfile, onEdit }: ProfileProps) {
+export default function Profile({ userProfile, onEdit, onLogout }: ProfileProps) {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
@@ -50,6 +51,9 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
           </div>
           <h2 className="text-xl font-bold text-white mb-1">Lycéen</h2>
           <p className="text-primary-100">{userProfile.age || 16} ans • {userProfile.grade || 'Seconde'}</p>
+          {userProfile.email && (
+            <p className="text-primary-200 text-sm mt-1">{userProfile.email}</p>
+          )}
         </div>
       </div>
 
@@ -64,7 +68,7 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
               </div>
               <h3 className="font-bold text-gray-800">Profil de personnalité</h3>
             </div>
-            
+
             <div className="space-y-2">
               {userProfile.riasecProfile.map((code, index) => (
                 <div key={code} className="flex items-center gap-3">
@@ -159,6 +163,17 @@ export default function Profile({ userProfile, onEdit }: ProfileProps) {
         >
           Modifier mon profil
         </button>
+
+        {/* Logout Button */}
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-600 py-4 rounded-2xl font-semibold hover:bg-red-50 hover:text-red-500 transition-colors"
+        >
+          <LogOut className="w-5 h-5" />
+          Se déconnecter
+        </button>
+
+        <div className="h-2" />
       </div>
     </div>
   );
