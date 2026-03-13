@@ -16,6 +16,7 @@ import FormationDetail from "./components/FormationDetail";
 import Favorites from "./components/Favorites";
 import Profile from "./components/Profile";
 import BottomNav from "./components/BottomNav";
+import { clearChatHistory } from './components/Chatbot';
 
 export type Screen =
   | "splash"
@@ -131,6 +132,7 @@ function App() {
   // ── Déconnexion ──────────────────────────────────────────────────────────
   const handleLogout = () => {
     localStorage.removeItem('token');
+    clearChatHistory();
     setUserProfile({
       favoriteJobs: [],
       savedFormations: [],

@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Search, BookmarkPlus, Bookmark, ExternalLink } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, BookmarkPlus, Bookmark, ExternalLink, Sparkles } from 'lucide-react';
 import type { UserProfile } from '../App';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,7 +28,6 @@ import careersData from '../data/careers_onisep.json';
 
 const rawCareers: Career[] = careersData as Career[];
 
-// Dédupliquer par title (au cas où des ids différents auraient le même titre)
 const seen = new Set<string>();
 const careers: Career[] = rawCareers.filter(c => {
   const key = c.title.toLowerCase().trim();
@@ -46,34 +45,6 @@ function normalize(str: string): string {
     .replace(/[^a-zA-Z0-9\s]/g, " ")
     .toLowerCase()
     .trim();
-}
-
-/** Retourne une couleur Tailwind selon le secteur */
-function sectorColor(sector: string): string {
-  const map: Record<string, string> = {
-    'Informatique & Numérique': 'from-blue-400 to-blue-600',
-    'Santé & Social':           'from-red-400 to-red-600',
-    'Commerce & Gestion':       'from-orange-400 to-orange-600',
-    'Communication & Médias':   'from-purple-400 to-purple-600',
-    'Enseignement':             'from-green-400 to-green-600',
-    'Bâtiment':                 'from-stone-400 to-stone-600',
-    'Transport & Logistique':   'from-sky-400 to-sky-600',
-    'Hôtellerie & Tourisme':    'from-yellow-400 to-yellow-600',
-    'Agriculture':              'from-lime-400 to-lime-600',
-    'Chimie & Biologie':        'from-teal-400 to-teal-600',
-    'Administration':           'from-slate-400 to-slate-600',
-    'Sécurité & Défense':       'from-zinc-500 to-zinc-700',
-  };
-  return map[sector] ?? 'from-gray-400 to-gray-600';
-}
-
-/** Initiales du secteur pour l'avatar */
-function sectorInitials(sector: string): string {
-  return sector
-    .split(/[\s&]+/)
-    .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('');
 }
 
 const ALL_SECTORS = [
@@ -114,6 +85,18 @@ export default function CareersExplorer({
   const [selectedSector, setSelectedSector] = useState('Tous');
   const [page, setPage]                     = useState(1);
 
+  // ✅ Lire le filtre posé par le chatbot
+  useEffect(() => {
+    const sectorFilter = localStorage.getItem("careerFilter");
+    if (sectorFilter) {
+      // Vérifier que le secteur existe dans ALL_SECTORS
+      const match = ALL_SECTORS.find(s => s === sectorFilter);
+      if (match) setSelectedSector(match);
+      setPage(1);
+      localStorage.removeItem("careerFilter");
+    }
+  }, []);
+
   const filtered = useMemo(() => {
     const words = normalize(searchTerm).split(/\s+/).filter(Boolean);
     return careers.filter(c => {
@@ -145,6 +128,22 @@ export default function CareersExplorer({
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Explorer les métiers
         </h1>
+
+        {/* ✅ Bandeau filtre actif venant du chatbot */}
+        {selectedSector !== 'Tous' && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-primary-50 border border-primary-200 rounded-xl">
+            <Sparkles className="w-4 h-4 text-primary-500 flex-shrink-0" />
+            <span className="text-sm text-primary-700 font-medium flex-1">
+              Filtré par : <strong>{selectedSector}</strong>
+            </span>
+            <button
+              onClick={() => { setSelectedSector('Tous'); setPage(1); }}
+              className="text-xs text-primary-500 hover:text-primary-700 font-medium"
+            >
+              ✕ Effacer
+            </button>
+          </div>
+        )}
 
         {/* Search */}
         <div className="relative mb-4">
@@ -182,29 +181,18 @@ export default function CareersExplorer({
           const favorite = isFavorite(career.id);
 
           return (
-            <div
-              key={career.id}
-              className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow"
-            >
+            <div key={career.id} className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start">
                 <div className="flex-1 min-w-0">
-
-                  {/* Title */}
                   <h3 className="font-bold text-gray-800 mb-1 leading-snug capitalize">
                     {career.title}
                   </h3>
-
-                  {/* Sector */}
                   <p className="text-sm text-gray-500 mb-2">{career.sector}</p>
-
-                  {/* Domaines */}
                   {career.domaines.length > 0 && (
                     <p className="text-xs text-gray-400 mb-3 line-clamp-1">
                       {career.domaines.join(' · ')}
                     </p>
                   )}
-
-                  {/* Actions */}
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCareerClick(career.id)}
@@ -212,8 +200,6 @@ export default function CareersExplorer({
                     >
                       Voir le détail
                     </button>
-
-                    {/* Lien ONISEP direct */}
                     <a
                       href={career.url_onisep}
                       target="_blank"
@@ -223,7 +209,6 @@ export default function CareersExplorer({
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
-
                     <button
                       onClick={() => onToggleFavorite(career.id)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
@@ -244,7 +229,6 @@ export default function CareersExplorer({
         })}
       </div>
 
-      {/* Load more */}
       {hasMore && (
         <div className="flex justify-center pb-6">
           <button
@@ -259,6 +243,12 @@ export default function CareersExplorer({
       {filtered.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Aucun métier trouvé</p>
+          <button
+            onClick={() => { setSelectedSector('Tous'); setSearchTerm(''); setPage(1); }}
+            className="mt-3 text-sm text-primary-500 underline"
+          >
+            Effacer les filtres
+          </button>
         </div>
       )}
     </div>

@@ -22,9 +22,9 @@ import type { UserProfile } from "../App";
 
 function normalize(str: string): string {
   return str
-    .normalize("NFD")                    // décompose les accents
-    .replace(/[\u0300-\u036f]/g, "")     // supprime les diacritiques
-    .replace(/[^a-zA-Z0-9\s]/g, " ")    // remplace les caractères spéciaux par un espace
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
     .toLowerCase()
     .trim();
 }
@@ -110,8 +110,6 @@ function getRiasecFromDomains(domainStr: string): string[] {
   return [...new Set(codes)].slice(0, 3);
 }
 
-/** Calcule le score de matching entre les codes RIASEC de la formation et le profil utilisateur.
- *  Retourne un nombre entre 0 et 3 (nombre de codes en commun). */
 function getRiasecMatchScore(formationCodes: string[], userProfile: string[]): number {
   return formationCodes.filter(c => userProfile.includes(c)).length;
 }
@@ -128,6 +126,7 @@ export default function FormationsExplorer({
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
+  // ✅ selectedSector reçoit directement le domaine exact (ex: "Informatique et Numérique")
   const [selectedSector, setSelectedSector] = useState<string>("Tous");
   const [showMatchOnly, setShowMatchOnly] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -138,16 +137,26 @@ export default function FormationsExplorer({
   const primaryCodes: string[] = userRiasec.slice(0, primaryCount);
   const hasRiasecProfile = userRiasec.length > 0;
 
-  /* -------------------- FETCH DATA -------------------- */
+  /* -------------------- LIRE LE FILTRE DU CHATBOT -------------------- */
 
   useEffect(() => {
-    const filter = localStorage.getItem("formationFilter");
-    if (filter) {
-      setSearchTerm(filter);
+    // Filtre domaine depuis chatbot (domaines/métiers)
+    const domainFilter = localStorage.getItem("formationFilter");
+    if (domainFilter) {
+      setSelectedSector(domainFilter);
       setPage(1);
-      localStorage.removeItem("formationFilter"); // ✅ consommer le filtre
+      localStorage.removeItem("formationFilter");
+    }
+    // Filtre recherche textuelle depuis chatbot (type de formation : BTS, BUT, Licence...)
+    const searchFilter = localStorage.getItem("formationSearchTerm");
+    if (searchFilter) {
+      setSearchTerm(searchFilter);
+      setPage(1);
+      localStorage.removeItem("formationSearchTerm");
     }
   }, []);
+
+  /* -------------------- FETCH DATA -------------------- */
 
   useEffect(() => {
     fetch("/data/formations_final.json")
@@ -202,11 +211,12 @@ export default function FormationsExplorer({
         const q = normalize(searchTerm);
         const words = q.split(/\s+/).filter(Boolean);
         const titleNorm = normalize(f.title);
-        const etabNorm = normalize(f.etablissement);
+        const etabNorm = normalize(f.etablissement ?? "");
         const matchesSearch =
           words.length === 0 ||
           words.every(w => titleNorm.includes(w) || etabNorm.includes(w));
 
+        // ✅ filtre par domaine exact
         const matchesSector =
           selectedSector === "Tous" || domains.includes(selectedSector);
 
@@ -216,8 +226,10 @@ export default function FormationsExplorer({
         return matchesSearch && matchesSector && matchesRiasecFilter;
       });
 
-    // Trier : formations avec le meilleur match RIASEC en premier
-    if (hasRiasecProfile) {
+    // Tri alphabétique quand "Tous", RIASEC en premier quand un domaine est filtré
+    if (selectedSector === "Tous") {
+      list.sort((a, b) => (a.title ?? "").localeCompare(b.title ?? "", "fr"));
+    } else if (hasRiasecProfile) {
       list.sort((a, b) => b._matchScore - a._matchScore);
     }
 
@@ -229,8 +241,6 @@ export default function FormationsExplorer({
   const isFavorite = (formationId: string) => {
     return userProfile.savedFormations?.includes(formationId);
   };
-
-  /* -------------------- LOADING STATE -------------------- */
 
   if (loading) {
     return (
@@ -257,10 +267,7 @@ export default function FormationsExplorer({
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
             placeholder="Rechercher une formation..."
             className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary-300"
           />
@@ -270,33 +277,23 @@ export default function FormationsExplorer({
         {hasRiasecProfile && (
           <div className="mb-4">
             <button
-              onClick={() => {
-                setShowMatchOnly(prev => !prev);
-                setPage(1);
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-colors ${showMatchOnly
-                ? "bg-yellow-400 text-yellow-900"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+              onClick={() => { setShowMatchOnly(prev => !prev); setPage(1); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-colors ${
+                showMatchOnly
+                  ? "bg-yellow-400 text-yellow-900"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
             >
               <Sparkles className="w-4 h-4" />
-              {showMatchOnly
-                ? "Afficher toutes les formations"
-                : "Voir uniquement les formations qui me correspondent"}
+              {showMatchOnly ? "Afficher toutes les formations" : "Voir uniquement les formations qui me correspondent"}
             </button>
-
-            {/* Profil RIASEC de l'utilisateur */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="text-s text-gray-400">Votre profil :</span>
               {userRiasec.map(code => {
                 const r = RIASEC_LABELS[code];
                 if (!r) return null;
                 return (
-                  <span
-                    key={code}
-                    style={{ backgroundColor: r.bg, color: r.color }}
-                    className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                  >
+                  <span key={code} style={{ backgroundColor: r.bg, color: r.color }} className="px-2 py-0.5 rounded-full text-xs font-semibold">
                     {code} · {r.label}
                   </span>
                 );
@@ -305,19 +302,17 @@ export default function FormationsExplorer({
           </div>
         )}
 
-        {/* FILTER BAR */}
+        {/* FILTER BAR — domaines */}
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
           {sectors.map((sector: string) => (
             <button
               key={sector}
-              onClick={() => {
-                setSelectedSector(sector);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${selectedSector === sector
-                ? "bg-primary-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+              onClick={() => { setSelectedSector(sector); setPage(1); }}
+              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors text-sm ${
+                selectedSector === sector
+                  ? "bg-primary-500 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
               {sector}
             </button>
@@ -328,11 +323,7 @@ export default function FormationsExplorer({
       {/* CARDS */}
       <div className="p-6 space-y-3">
         {displayedFormations.map((f) => {
-
-          const firstDomain = f.domain
-            ? f.domain.split(",")[0].trim()
-            : "Autre";
-
+          const firstDomain = f.domain ? f.domain.split(",")[0].trim() : "Autre";
           const Icon = getIconFromDomain(firstDomain);
           const favorite = isFavorite(f.id);
           const matchScore = f._matchScore as number;
@@ -340,96 +331,47 @@ export default function FormationsExplorer({
           const isMatch = hasRiasecProfile && matchScore > 0;
 
           return (
-            <div
-              key={f.id}
-              className={`bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${isMatch ? "ring-2 ring-yellow-300" : ""
-                }`}
-            >
+            <div key={f.id} className={`bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${isMatch ? "ring-2 ring-yellow-300" : ""}`}>
               <div className="flex items-start gap-4">
-
                 <div className="w-14 h-14 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-
                 <div className="flex-1 min-w-0">
-
-                  {/* MATCH BADGE — uniquement si le profil principal (1er code) matche */}
                   {hasRiasecProfile && riasecCodes.some(c => primaryCodes.includes(c)) && (
                     <div className="flex items-center gap-1 mb-1">
                       <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
-                      <span className="text-xs font-semibold text-yellow-600">
-                        Correspond à votre profil
-                      </span>
+                      <span className="text-xs font-semibold text-yellow-600">Correspond à votre profil</span>
                     </div>
                   )}
-
-                  <h3 className="font-bold text-gray-800 mb-1">
-                    {f.title}
-                  </h3>
-
-                  <div className="text-sm text-gray-600 mb-1">
-                    {f.etablissement}
-                  </div>
-
-                  {/* DOMAIN TAGS */}
+                  <h3 className="font-bold text-gray-800 mb-1">{f.title}</h3>
+                  <div className="text-sm text-gray-600 mb-1">{f.etablissement}</div>
                   <div className="text-xs text-gray-500 mb-2 flex flex-wrap gap-1">
                     {f.domain
                       ? f.domain.split(",").map((d: string, i: number) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                        >
-                          {d.trim()}
-                        </span>
-                      ))
-                      : (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
-                          Autre
-                        </span>
-                      )
+                          <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">{d.trim()}</span>
+                        ))
+                      : <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">Autre</span>
                     }
                   </div>
-
-                  {/* RIASEC BADGES */}
                   {riasecCodes.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {riasecCodes.map(code => {
                         const r = RIASEC_LABELS[code];
                         const isUserCode = userRiasec.includes(code);
                         return (
-                          <span
-                            key={code}
-                            style={{ backgroundColor: r.bg, color: r.color }}
-                            className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isUserCode ? "ring-2 ring-offset-1 ring-yellow-400" : ""
-                              }`}
-                          >
+                          <span key={code} style={{ backgroundColor: r.bg, color: r.color }} className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isUserCode ? "ring-2 ring-offset-1 ring-yellow-400" : ""}`}>
                             {code} · {r.label}
                           </span>
                         );
                       })}
                     </div>
                   )}
-
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => onFormationClick(f.id)}
-                      className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
-                    >
+                    <button onClick={() => onFormationClick(f.id)} className="flex-1 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors">
                       Voir le détail
                     </button>
-
-                    <button
-                      onClick={() => onToggleFavorite(f.id)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${favorite
-                        ? "bg-primary-100 text-primary-600"
-                        : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                        }`}
-                    >
-                      {favorite ? (
-                        <Bookmark className="w-5 h-5 fill-current" />
-                      ) : (
-                        <BookmarkPlus className="w-5 h-5" />
-                      )}
+                    <button onClick={() => onToggleFavorite(f.id)} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${favorite ? "bg-primary-100 text-primary-600" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
+                      {favorite ? <Bookmark className="w-5 h-5 fill-current" /> : <BookmarkPlus className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
@@ -439,22 +381,20 @@ export default function FormationsExplorer({
         })}
       </div>
 
-      {/* LOAD MORE */}
       {displayedFormations.length < filteredFormations.length && (
         <div className="flex justify-center py-6">
-          <button
-            onClick={() => setPage(prev => prev + 1)}
-            className="px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors"
-          >
+          <button onClick={() => setPage(prev => prev + 1)} className="px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors">
             Voir plus
           </button>
         </div>
       )}
 
-      {/* EMPTY STATE */}
       {filteredFormations.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Aucune formation trouvée</p>
+          <button onClick={() => { setSelectedSector("Tous"); setSearchTerm(""); setPage(1); }} className="mt-3 text-sm text-primary-500 underline">
+            Effacer les filtres
+          </button>
         </div>
       )}
     </div>
