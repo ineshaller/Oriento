@@ -129,22 +129,6 @@ export default function CareersExplorer({
           Explorer les métiers
         </h1>
 
-        {/* ✅ Bandeau filtre actif venant du chatbot */}
-        {selectedSector !== 'Tous' && (
-          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-primary-50 border border-primary-200 rounded-xl">
-            <Sparkles className="w-4 h-4 text-primary-500 flex-shrink-0" />
-            <span className="text-sm text-primary-700 font-medium flex-1">
-              Filtré par : <strong>{selectedSector}</strong>
-            </span>
-            <button
-              onClick={() => { setSelectedSector('Tous'); setPage(1); }}
-              className="text-xs text-primary-500 hover:text-primary-700 font-medium"
-            >
-              ✕ Effacer
-            </button>
-          </div>
-        )}
-
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
