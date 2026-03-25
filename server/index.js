@@ -5,7 +5,9 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
 
-dotenv.config({ path: '../.env' });
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+require('dotenv').config();
 
 const app = express();
 

@@ -10,16 +10,25 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'Email déjà utilisé' });
+    // Vérification si l'utilisateur existe déjà
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Cet email est déjà utilisé.' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, password: hashedPassword });
+    const user = new User({ 
+      email: email.toLowerCase(), 
+      password: hashedPassword 
+    });
+    
     await user.save();
+    console.log(`✅ Nouvel utilisateur créé : ${email}`);
+    res.status(201).json({ message: 'Compte créé avec succès !' });
 
-    res.status(201).json({ message: 'Compte créé avec succès' });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+    console.error('❌ Erreur Register:', err);
+    res.status(500).json({ message: 'Erreur lors de la création du compte.' });
   }
 });
 
@@ -28,17 +37,28 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(400).json({ message: 'Email ou mot de passe incorrect.' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Email ou mot de passe incorrect.' });
+    }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { userId: user._id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
 
-    res.json({ token, message: 'Connexion réussie' });
+    console.log(`🔑 Connexion réussie pour : ${email}`);
+    res.json({ token, message: 'Connexion réussie.' });
+
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+    console.error('❌ Erreur Login:', err);
+    res.status(500).json({ message: 'Le serveur ne répond pas.' });
   }
 });
 

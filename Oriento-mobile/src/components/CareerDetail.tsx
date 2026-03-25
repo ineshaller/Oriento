@@ -189,6 +189,15 @@ export default function CareerDetail({ careerId, userProfile, onBack, onToggleFa
             </View>
             <ExternalLink size={20} color={colors.primary500} />
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.onisepLink} onPress={() => Linking.openURL("https://www.onisep.fr/")} activeOpacity={0.8}>
+            <Image source={require("../../assets/logo_onisep.jpg")} style={{ width: 70, height: 20 }} resizeMode="contain" />
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.onisepLinkTitle}>Données récupérées sur le site Onisep.fr</Text>
+              <Text style={styles.onisepLinkSub}>L'information officielle pour l'orientation</Text>
+            </View>
+            <ExternalLink size={20} color={colors.primary500} />
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
