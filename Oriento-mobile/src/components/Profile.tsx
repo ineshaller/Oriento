@@ -35,6 +35,14 @@ export default function Profile({ userProfile, onEdit, onLogout }: ProfileProps)
         <View style={styles.avatar}>
           <User size={48} color={colors.white} />
         </View>
+
+        {/* Affichage Prénom + Nom au-dessus de Lycéen */}
+        {(userProfile.firstName || userProfile.lastName) && (
+          <Text style={styles.avatarName}>
+            {userProfile.firstName} {userProfile.lastName}
+          </Text>
+        )}
+
         <Text style={styles.avatarName}>Lycéen</Text>
         <Text style={styles.avatarInfo}>{userProfile.age || 16} ans · {userProfile.grade || "Seconde"}</Text>
         {userProfile.email && <Text style={styles.avatarEmail}>{userProfile.email}</Text>}

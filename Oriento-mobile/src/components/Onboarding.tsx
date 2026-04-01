@@ -58,7 +58,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         )}
         <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
           <Text style={styles.nextText}>
-            {currentSlide === slides.length - 1 ? "Lancer le test" : "Suivant"}
+            {currentSlide === slides.length - 1 ? "Continuer" : "Suivant"}
           </Text>
           <ChevronRight size={20} color={colors.white} />
         </TouchableOpacity>

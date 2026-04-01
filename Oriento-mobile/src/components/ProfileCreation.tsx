@@ -122,7 +122,7 @@ export default function ProfileCreation({ userProfile, onComplete }: ProfileCrea
         {step === 3 && !isSeconde && (
           <View>
             <Text style={styles.stepTitle}>Tes spécialités</Text>
-            <Text style={styles.stepSubtitle}>Choisis tes spécialités (3 max)</Text>
+            <Text style={styles.stepSubtitle}>Choisis tes spécialités</Text>
             <View style={styles.chips}>
               {specialties.map(s => (
                 <TouchableOpacity key={s} onPress={() => toggleSpecialty(s)} style={[styles.chip, selectedSpecialties.includes(s) && styles.chipActive]}>

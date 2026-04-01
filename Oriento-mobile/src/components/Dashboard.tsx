@@ -48,7 +48,10 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
             />
           </View>
           <View>
-            <Text style={styles.headerTitle}>Bonjour !</Text>
+            {/* Modification ici : Bonjour [Prénom] ! */}
+            <Text style={styles.headerTitle}>
+              Bonjour{userProfile.firstName ? ` ${userProfile.firstName}` : ""} !
+            </Text>
             <Text style={styles.headerSubtitle}>{userProfile.grade || "Lycéen"} · {userProfile.age || 16} ans</Text>
           </View>
         </View>
@@ -64,6 +67,8 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
         </View>
       </View>
 
+      {/* ... reste du code inchangé ... */}
+      
       {/* Badge débloqué */}
       {allDone && (
         <View style={styles.badgeCard}>
@@ -208,7 +213,6 @@ export default function Dashboard({ userProfile, onNavigate, onCareerClick }: Da
           })}
         </View>
       )}
-
     </ScrollView>
   );
 }

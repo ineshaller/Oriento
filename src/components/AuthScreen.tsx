@@ -13,6 +13,8 @@ export default function AuthScreen({ onAuthComplete }: AuthScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
@@ -26,13 +28,15 @@ export default function AuthScreen({ onAuthComplete }: AuthScreenProps) {
 
   const handleRegister = async () => {
     clearErrors();
+    if (!firstName.trim()) return setError('Saisis ton prénom.');
+    if (!lastName.trim()) return setError('Saisis ton nom.');
     if (!validateEmail(email)) return setError('Adresse email invalide.');
     if (!validatePassword(password)) return setError('Le mot de passe doit contenir au moins 8 caractères.');
     if (password !== confirmPassword) return setError('Les mots de passe ne correspondent pas.');
 
     setLoading(true);
     try {
-      const res = await register(email, password);
+      const res = await register(email, password, firstName, lastName);
       if (res.message?.toLowerCase().includes('erreur') || res.error) {
         setError(res.message || 'Une erreur est survenue.');
       } else {
@@ -261,6 +265,20 @@ export default function AuthScreen({ onAuthComplete }: AuthScreenProps) {
         <div className="space-y-4">
           <InputField
             icon={<Mail className="w-5 h-5" />}
+            type="text"
+            placeholder="Prénom"
+            value={firstName}
+            onChange={(v) => { setFirstName(v); clearErrors(); }}
+          />
+          <InputField
+            icon={<Mail className="w-5 h-5" />}
+            type="text"
+            placeholder="Nom"
+            value={lastName}
+            onChange={(v) => { setLastName(v); clearErrors(); }}
+          />
+          <InputField
+            icon={<Mail className="w-5 h-5" />}
             type="email"
             placeholder="ton@email.com"
             value={email}
@@ -300,7 +318,7 @@ export default function AuthScreen({ onAuthComplete }: AuthScreenProps) {
 
           <button
             onClick={handleRegister}
-            disabled={loading || !email || !password || !confirmPassword}
+            disabled={loading || !email || !password || !confirmPassword || !firstName || !lastName}
             className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-4"
           >
             {loading ? 'Création du compte...' : 'Créer mon compte'}

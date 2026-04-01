@@ -175,12 +175,8 @@ export default function TestResults({ riasecProfile, scores, onExplore, onChat }
       {/* CTAs */}
       <View style={styles.ctas}>
         <TouchableOpacity style={styles.exploreBtn} onPress={onExplore} activeOpacity={0.8}>
-          <Text style={styles.exploreBtnText}>Explorer les métiers</Text>
+          <Text style={styles.exploreBtnText}>Aller au dashboard</Text>
           <ArrowRight size={20} color={colors.white} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.chatBtn} onPress={onChat} activeOpacity={0.8}>
-          <MessageCircle size={20} color={colors.primary600} />
-          <Text style={styles.chatBtnText}>Discuter avec le chatbot</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

@@ -1,4 +1,4 @@
-// App.tsx — Version Expo/React Native connectée au backend
+// App.tsx — Version corrigée pour Prénom et Nom
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -42,6 +42,8 @@ export type Screen =
 
 export interface UserProfile {
   email?: string;
+  firstName?: string; // Ajouté
+  lastName?: string;  // Ajouté
   token?: string;
   age?: number;
   grade?: string;
@@ -199,15 +201,21 @@ export default function App() {
               email,
               token,
               isNewUser,
+              firstName, // Récupéré de AuthScreen
+              lastName,  // Récupéré de AuthScreen
             }: {
               email: string;
               token: string;
               isNewUser: boolean;
+              firstName?: string;
+              lastName?: string;
             }) => {
               if (token === "demo-token") {
                 updateProfile({
                   email,
                   token,
+                  firstName: "Jean",
+                  lastName: "Demo",
                   age: 17,
                   grade: "Terminale",
                   specialties: ["Maths", "NSI"],
@@ -223,7 +231,8 @@ export default function App() {
               }
 
               if (isNewUser) {
-                updateProfile({ email, token });
+                // On sauvegarde le prénom et nom reçus lors de l'inscription
+                updateProfile({ email, token, firstName, lastName });
                 setCurrentScreen("profile-creation");
               } else {
                 try {
@@ -233,6 +242,8 @@ export default function App() {
                   updateProfile({
                     email,
                     token,
+                    firstName: p.firstName, // Récupéré du backend
+                    lastName: p.lastName,   // Récupéré du backend
                     age: p.age,
                     grade: p.grade,
                     specialties: p.specialties || [],
@@ -325,7 +336,7 @@ export default function App() {
           <TestResults
             riasecProfile={userProfile.riasecProfile || []}
             scores={userProfile.riasecScores}
-            onExplore={() => setCurrentScreen("careers")}
+            onExplore={() => setCurrentScreen("dashboard")}
             onChat={() => setCurrentScreen("chatbot")}
           />
         );

@@ -85,7 +85,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onClick={handleNext}
           className="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg"
         >
-          {currentSlide === slides.length - 1 ? 'Lancer le test' : 'Suivant'}
+          {currentSlide === slides.length - 1 ? 'Commencer' : 'Suivant'}
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>

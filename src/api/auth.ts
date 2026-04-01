@@ -4,11 +4,11 @@ const PROFILE_URL = 'http://localhost:3001/api/profile';
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
-export async function register(email: string, password: string) {
+export async function register(email: string, password: string, firstName: string, lastName: string) {
   const res = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password, firstName, lastName })
   });
   return res.json();
 }

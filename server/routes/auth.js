@@ -8,7 +8,7 @@ const router = express.Router();
 // Inscription
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
     // Vérification si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -19,11 +19,13 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ 
       email: email.toLowerCase(), 
-      password: hashedPassword 
+      password: hashedPassword,
+      firstName: firstName || '',
+      lastName: lastName || ''
     });
     
     await user.save();
-    console.log(`✅ Nouvel utilisateur créé : ${email}`);
+    console.log(`✅ Nouvel utilisateur créé : ${email} (${firstName} ${lastName})`);
     res.status(201).json({ message: 'Compte créé avec succès !' });
 
   } catch (err) {
